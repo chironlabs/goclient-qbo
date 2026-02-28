@@ -25,25 +25,28 @@ const (
 )
 
 type Account struct {
-	ID                            string        `json:"Id,omitempty"`
-	Name                          string        `json:",omitempty"`
-	SyncToken                     string        `json:",omitempty"`
-	AcctNum                       string        `json:",omitempty"`
-	CurrencyRef                   ReferenceType `json:",omitempty"`
-	ParentRef                     ReferenceType `json:",omitempty"`
-	Description                   string        `json:",omitempty"`
-	Active                        bool          `json:",omitempty"`
-	MetaData                      MetaData      `json:",omitempty"`
-	SubAccount                    bool          `json:",omitempty"`
-	Classification                string        `json:",omitempty"`
-	FullyQualifiedName            string        `json:",omitempty"`
-	TxnLocationType               string        `json:",omitempty"`
-	AccountType                   string        `json:",omitempty"`
-	CurrentBalanceWithSubAccounts json.Number   `json:",omitempty"`
-	AccountAlias                  string        `json:",omitempty"`
-	TaxCodeRef                    ReferenceType `json:",omitempty"`
-	AccountSubType                string        `json:",omitempty"`
-	CurrentBalance                json.Number   `json:",omitempty"`
+	ID                 string         `json:"Id,omitempty"`
+	Name               string         `json:",omitempty"`
+	SyncToken          string         `json:",omitempty"`
+	AcctNum            *string        `json:",omitempty"`
+	CurrencyRef        *ReferenceType `json:",omitempty"`
+	ParentRef          *ReferenceType `json:",omitempty"`
+	Description        *string        `json:",omitempty"`
+	Active             *bool          `json:",omitempty"`
+	MetaData           *MetaData      `json:",omitempty"`
+	SubAccount         bool           `json:",omitempty"`
+	Classification     string         `json:",omitempty"`
+	FullyQualifiedName string         `json:",omitempty"`
+	// for France locale only: Values -> WithinFrance, FranceOverseas, OutsideFranceWithEU, OutsideEU
+	TxnLocationType               *string     `json:",omitempty"`
+	AccountType                   string      `json:",omitempty"`
+	CurrentBalanceWithSubAccounts json.Number `json:",omitempty"`
+	AccountAlias                  string      `json:",omitempty"`
+
+	//	For global locale
+	TaxCodeRef     ReferenceType `json:",omitempty"`
+	AccountSubType string        `json:",omitempty"`
+	CurrentBalance json.Number   `json:",omitempty"`
 }
 
 // CreateAccount creates the given account within QuickBooks

@@ -28,7 +28,7 @@ type Vendor struct {
 	TaxReportingBasis string          `json:",omitempty"`
 	Mobile            TelephoneNumber `json:",omitempty"`
 	PrimaryPhone      TelephoneNumber `json:",omitempty"`
-	Active            bool            `json:",omitempty"`
+	Active            bool
 	AlternatePhone    TelephoneNumber `json:",omitempty"`
 	MetaData          MetaData        `json:",omitempty"`
 	Vendor1099        bool            `json:",omitempty"`

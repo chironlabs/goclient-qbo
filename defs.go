@@ -1,12 +1,9 @@
-// Copyright (c) 2018, Randy Westlund. All rights reserved.
-// This code is under the BSD-2-Clause license.
-
 package quickbooks
 
 import "time"
 
 type CustomField struct {
-	DefinitionId string `json:"DefinitionId,omitempty"`
+	DefinitionID string `json:"DefinitionId,omitempty"`
 	StringValue  string `json:"StringValue,omitempty"`
 	Type         string `json:"Type,omitempty"`
 	Name         string `json:"Name,omitempty"`
@@ -37,28 +34,28 @@ func (d Date) String() string {
 
 // EmailAddress represents a QuickBooks email address.
 type EmailAddress struct {
-	Address string `json:",omitempty"`
+	Address *string `json:",omitempty"`
 }
 
-// EndpointUrl specifies the endpoint to connect to
-type EndpointUrl string
+// EndpointURL specifies the endpoint to connect to
+type EndpointURL string
 
 const (
 	// DiscoveryProductionEndpoint is for live apps.
-	DiscoveryProductionEndpoint EndpointUrl = "https://developer.api.intuit.com/.well-known/openid_configuration"
+	DiscoveryProductionEndpoint EndpointURL = "https://developer.api.intuit.com/.well-known/openid_configuration"
 	// DiscoverySandboxEndpoint is for testing.
-	DiscoverySandboxEndpoint EndpointUrl = "https://developer.api.intuit.com/.well-known/openid_sandbox_configuration"
+	DiscoverySandboxEndpoint EndpointURL = "https://developer.api.intuit.com/.well-known/openid_sandbox_configuration"
 	// ProductionEndpoint is for live apps.
-	ProductionEndpoint EndpointUrl = "https://quickbooks.api.intuit.com"
+	ProductionEndpoint EndpointURL = "https://quickbooks.api.intuit.com"
 	// SandboxEndpoint is for testing.
-	SandboxEndpoint EndpointUrl = "https://sandbox-quickbooks.api.intuit.com"
+	SandboxEndpoint EndpointURL = "https://sandbox-quickbooks.api.intuit.com"
 
 	format        = "2006-01-02T15:04:05-07:00"
 	queryPageSize = 1000
 	secondFormat  = "2006-01-02"
 )
 
-func (u EndpointUrl) String() string {
+func (u EndpointURL) String() string {
 	return string(u)
 }
 
@@ -91,11 +88,15 @@ type Address struct {
 	Long                   string `json:",omitempty"`
 }
 
-// ReferenceType represents a QuickBooks reference to another object.
-type ReferenceType struct {
+type NameValue struct {
 	Value string `json:"value,omitempty"`
 	Name  string `json:"name,omitempty"`
-	Type  string `json:"type,omitempty"`
+}
+
+// ReferenceType represents a QuickBooks reference to another object.
+type ReferenceType struct {
+	NameValue
+	Type string `json:"type,omitempty"`
 }
 
 // TelephoneNumber represents a QuickBooks phone number.

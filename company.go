@@ -1,34 +1,24 @@
 package quickbooks
 
 type CompanyInfo struct {
-	Id                        string
-	SyncToken                 string
-	Domain                    string `json:"domain"`
-	LegalAddr                 *Address
-	SupportedLanguages        *string
-	CompanyName               string
-	Country                   *string
-	CompanyAddr               Address
 	ID                        string `json:"Id"`
-	FiscalYearStartMonth      *string
-	CustomerCommunicationAddr *Address
-	PrimaryPhone              *struct {
-		FreeFormNumber *string
-	}
-	LegalName        *string
-	CompanyStartDate *string
-	EmployerID       *string `json:"EmployerId"`
-	Email            *struct {
-		Address string
-	}
-	WebAddr *struct {
-		URI *string `json:",omitempty"`
-	}
-	NameValue []struct {
-		Name  string
-		Value string
-	} `json:",omitempty"`
-	Metadata MetaData
+	SyncToken                 string
+	Domain                    string   `json:"domain"`
+	LegalAddr                 *Address `json:",omitempty"`
+	SupportedLanguages        *string  `json:",omitempty"`
+	CompanyName               string   `json:",omitempty"`
+	Country                   *string  `json:",omitempty"`
+	CompanyAddr               Address
+	FiscalYearStartMonth      *string          `json:",omitempty"`
+	CustomerCommunicationAddr *Address         `json:",omitempty"`
+	PrimaryPhone              *TelephoneNumber `json:",omitempty"`
+	LegalName                 *string          `json:",omitempty"`
+	CompanyStartDate          *string          `json:",omitempty"`
+	EmployerID                *string          `json:"EmployerId,omitempty"`
+	Email                     *EmailAddress    `json:",omitempty"`
+	WebAddr                   *WebSiteAddress  `json:",omitempty"`
+	NameValue                 []NameValue      `json:",omitempty"`
+	Metadata                  MetaData
 }
 
 // FindCompanyInfo returns the QuickBooks CompanyInfo object. This is a good
@@ -53,7 +43,7 @@ func (c *Client) UpdateCompanyInfo(companyInfo *CompanyInfo) (*CompanyInfo, erro
 		return nil, err
 	}
 
-	companyInfo.Id = existingCompanyInfo.Id
+	companyInfo.ID = existingCompanyInfo.ID
 	companyInfo.SyncToken = existingCompanyInfo.SyncToken
 
 	payload := struct {

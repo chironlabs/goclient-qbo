@@ -1,5 +1,4 @@
-// Copyright (c) 2018, Randy Westlund. All rights reserved.
-// This code is under the BSD-2-Clause license.
+// Package quickbooks is all the RESTful endpoints
 package quickbooks
 
 import (

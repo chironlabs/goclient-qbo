@@ -12,19 +12,19 @@ import (
 
 // Customer represents a QuickBooks Customer object.
 type Customer struct {
-	ID                 string          `json:"Id,omitempty"`
-	SyncToken          string          `json:",omitempty"`
-	MetaData           MetaData        `json:",omitempty"`
-	Title              string          `json:",omitempty"`
-	GivenName          string          `json:",omitempty"`
-	MiddleName         string          `json:",omitempty"`
-	FamilyName         string          `json:",omitempty"`
-	Suffix             string          `json:",omitempty"`
-	DisplayName        string          `json:",omitempty"`
-	FullyQualifiedName string          `json:",omitempty"`
-	CompanyName        string          `json:",omitempty"`
-	PrintOnCheckName   string          `json:",omitempty"`
-	Active             bool            `json:",omitempty"`
+	ID                 string   `json:"Id,omitempty"`
+	SyncToken          string   `json:",omitempty"`
+	MetaData           MetaData `json:",omitempty"`
+	Title              string   `json:",omitempty"`
+	GivenName          string   `json:",omitempty"`
+	MiddleName         string   `json:",omitempty"`
+	FamilyName         string   `json:",omitempty"`
+	Suffix             string   `json:",omitempty"`
+	DisplayName        string   `json:",omitempty"`
+	FullyQualifiedName string   `json:",omitempty"`
+	CompanyName        string   `json:",omitempty"`
+	PrintOnCheckName   string   `json:",omitempty"`
+	Active             bool
 	PrimaryPhone       TelephoneNumber `json:",omitempty"`
 	AlternatePhone     TelephoneNumber `json:",omitempty"`
 	Mobile             TelephoneNumber `json:",omitempty"`
@@ -71,8 +71,8 @@ func (c *Customer) GetWebsite() string {
 
 // GetPrimaryEmail de-nests the PrimaryEmailAddr object
 func (c *Customer) GetPrimaryEmail() string {
-	if c.PrimaryEmailAddr != nil {
-		return c.PrimaryEmailAddr.Address
+	if c.PrimaryEmailAddr != nil && c.PrimaryEmailAddr.Address != nil {
+		return *c.PrimaryEmailAddr.Address
 	}
 	return ""
 }

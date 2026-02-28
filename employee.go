@@ -12,13 +12,13 @@ type Employee struct {
 	PrimaryPhone     TelephoneNumber `json:",omitempty"`
 	PrintOnCheckName string          `json:",omitempty"`
 	FamilyName       string          `json:",omitempty"`
-	Active           bool            `json:",omitempty"`
-	SSN              string          `json:",omitempty"`
-	PrimaryAddr      Address         `json:",omitempty"`
-	BillableTime     bool            `json:",omitempty"`
-	GivenName        string          `json:",omitempty"`
-	ID               string          `json:"Id,omitempty"`
-	MetaData         MetaData        `json:",omitempty"`
+	Active           bool
+	SSN              string   `json:",omitempty"`
+	PrimaryAddr      Address  `json:",omitempty"`
+	BillableTime     bool     `json:",omitempty"`
+	GivenName        string   `json:",omitempty"`
+	ID               string   `json:"Id,omitempty"`
+	MetaData         MetaData `json:",omitempty"`
 }
 
 // CreateEmployee creates the given employee within QuickBooks
