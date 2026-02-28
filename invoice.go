@@ -23,12 +23,12 @@ type Invoice struct {
 	Line          []Line
 	TxnTaxDetail  TxnTaxDetail `json:",omitempty"`
 	CustomerRef   ReferenceType
-	CustomerMemo  MemoRef         `json:",omitempty"`
-	BillAddr      PhysicalAddress `json:",omitempty"`
-	ShipAddr      PhysicalAddress `json:",omitempty"`
-	ClassRef      ReferenceType   `json:",omitempty"`
-	SalesTermRef  ReferenceType   `json:",omitempty"`
-	DueDate       Date            `json:",omitempty"`
+	CustomerMemo  MemoRef       `json:",omitempty"`
+	BillAddr      Address       `json:",omitempty"`
+	ShipAddr      Address       `json:",omitempty"`
+	ClassRef      ReferenceType `json:",omitempty"`
+	SalesTermRef  ReferenceType `json:",omitempty"`
+	DueDate       Date          `json:",omitempty"`
 	// GlobalTaxCalculation
 	ShipMethodRef                ReferenceType `json:",omitempty"`
 	ShipDate                     Date          `json:",omitempty"`

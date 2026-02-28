@@ -6,25 +6,25 @@ import (
 )
 
 type Estimate struct {
-	DocNumber             string          `json:",omitempty"`
-	SyncToken             string          `json:",omitempty"`
-	Domain                string          `json:"domain,omitempty"`
-	TxnStatus             string          `json:",omitempty"`
-	BillEmail             EmailAddress    `json:",omitempty"`
-	TxnDate               Date            `json:",omitempty"`
-	TotalAmt              float64         `json:",omitempty"`
-	CustomerRef           ReferenceType   `json:",omitempty"`
-	CustomerMemo          MemoRef         `json:",omitempty"`
-	ShipAddr              PhysicalAddress `json:",omitempty"`
-	PrintStatus           string          `json:",omitempty"`
-	BillAddr              PhysicalAddress `json:",omitempty"`
-	EmailStatus           string          `json:",omitempty"`
-	Line                  []Line          `json:",omitempty"`
-	ApplyTaxAfterDiscount bool            `json:",omitempty"`
-	CustomField           []CustomField   `json:",omitempty"`
-	ID                    string          `json:"Id,omitempty"`
-	TxnTaxDetail          TxnTaxDetail    `json:",omitempty"`
-	MetaData              MetaData        `json:",omitempty"`
+	DocNumber             string        `json:",omitempty"`
+	SyncToken             string        `json:",omitempty"`
+	Domain                string        `json:"domain,omitempty"`
+	TxnStatus             string        `json:",omitempty"`
+	BillEmail             EmailAddress  `json:",omitempty"`
+	TxnDate               Date          `json:",omitempty"`
+	TotalAmt              float64       `json:",omitempty"`
+	CustomerRef           ReferenceType `json:",omitempty"`
+	CustomerMemo          MemoRef       `json:",omitempty"`
+	ShipAddr              Address       `json:",omitempty"`
+	PrintStatus           string        `json:",omitempty"`
+	BillAddr              Address       `json:",omitempty"`
+	EmailStatus           string        `json:",omitempty"`
+	Line                  []Line        `json:",omitempty"`
+	ApplyTaxAfterDiscount bool          `json:",omitempty"`
+	CustomField           []CustomField `json:",omitempty"`
+	ID                    string        `json:"Id,omitempty"`
+	TxnTaxDetail          TxnTaxDetail  `json:",omitempty"`
+	MetaData              MetaData      `json:",omitempty"`
 }
 
 // CreateEstimate creates the given Estimate on the QuickBooks server, returning

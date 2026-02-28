@@ -4,14 +4,14 @@ type CompanyInfo struct {
 	Id                        string
 	SyncToken                 string
 	Domain                    string `json:"domain"`
-	LegalAddr                 *PhysicalAddress
+	LegalAddr                 *Address
 	SupportedLanguages        *string
 	CompanyName               string
 	Country                   *string
-	CompanyAddr               PhysicalAddress
+	CompanyAddr               Address
 	ID                        string `json:"Id"`
 	FiscalYearStartMonth      *string
-	CustomerCommunicationAddr *PhysicalAddress
+	CustomerCommunicationAddr *Address
 	PrimaryPhone              *struct {
 		FreeFormNumber *string
 	}

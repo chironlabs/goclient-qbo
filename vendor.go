@@ -36,12 +36,12 @@ type Vendor struct {
 	WebAddr           *WebSiteAddress `json:",omitempty"`
 	CompanyName       string          `json:",omitempty"`
 	// VendorPaymentBankDetail
-	TaxIdentifier       string           `json:",omitempty"`
-	AcctNum             string           `json:",omitempty"`
-	GSTRegistrationType string           `json:",omitempty"`
-	PrintOnCheckName    string           `json:",omitempty"`
-	BillAddr            *PhysicalAddress `json:",omitempty"`
-	Balance             json.Number      `json:",omitempty"`
+	TaxIdentifier       string      `json:",omitempty"`
+	AcctNum             string      `json:",omitempty"`
+	GSTRegistrationType string      `json:",omitempty"`
+	PrintOnCheckName    string      `json:",omitempty"`
+	BillAddr            *Address    `json:",omitempty"`
+	Balance             json.Number `json:",omitempty"`
 }
 
 // CreateVendor creates the given Vendor on the QuickBooks server, returning

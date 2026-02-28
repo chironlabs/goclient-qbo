@@ -17,7 +17,7 @@ type BearerToken struct {
 	RefreshToken           string `json:"refresh_token"`
 	AccessToken            string `json:"access_token"`
 	TokenType              string `json:"token_type"`
-	IdToken                string `json:"id_token"`
+	IDToken                string `json:"id_token"`
 	ExpiresIn              int64  `json:"expires_in"`
 	XRefreshTokenExpiresIn int64  `json:"x_refresh_token_expires_in"`
 }

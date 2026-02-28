@@ -1,6 +1,3 @@
-// Copyright (c) 2018, Randy Westlund. All rights reserved.
-// This code is under the BSD-2-Clause license.
-
 package quickbooks
 
 import (
@@ -36,15 +33,15 @@ type Customer struct {
 	PrimaryEmailAddr   *EmailAddress   `json:",omitempty"`
 	WebAddr            *WebSiteAddress `json:",omitempty"`
 	// DefaultTaxCodeRef
-	Taxable              *bool            `json:",omitempty"`
-	TaxExemptionReasonId *string          `json:",omitempty"`
-	BillAddr             *PhysicalAddress `json:",omitempty"`
-	ShipAddr             *PhysicalAddress `json:",omitempty"`
-	Notes                string           `json:",omitempty"`
-	Job                  null.Bool        `json:",omitempty"`
-	BillWithParent       bool             `json:",omitempty"`
-	ParentRef            ReferenceType    `json:",omitempty"`
-	Level                int              `json:",omitempty"`
+	Taxable              *bool         `json:",omitempty"`
+	TaxExemptionReasonID *string       `json:"TaxExemptionReasonId,omitempty"`
+	BillAddr             *Address      `json:",omitempty"`
+	ShipAddr             *Address      `json:",omitempty"`
+	Notes                string        `json:",omitempty"`
+	Job                  null.Bool     `json:",omitempty"`
+	BillWithParent       bool          `json:",omitempty"`
+	ParentRef            ReferenceType `json:",omitempty"`
+	Level                int           `json:",omitempty"`
 	// SalesTermRef
 	// PaymentMethodRef
 	Balance         json.Number `json:",omitempty"`
@@ -54,14 +51,14 @@ type Customer struct {
 }
 
 // GetAddress prioritizes the ship address, but falls back on bill address
-func (c *Customer) GetAddress() PhysicalAddress {
+func (c *Customer) GetAddress() Address {
 	if c.ShipAddr != nil {
 		return *c.ShipAddr
 	}
 	if c.BillAddr != nil {
 		return *c.BillAddr
 	}
-	return PhysicalAddress{}
+	return Address{}
 }
 
 // GetWebsite de-nests the Website object

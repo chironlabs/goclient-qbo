@@ -73,17 +73,17 @@ type MetaData struct {
 	LastUpdatedTime Date `json:",omitempty"`
 }
 
-// PhysicalAddress represents a QuickBooks address.
-type PhysicalAddress struct {
+// Address represents a QuickBooks address.
+type Address struct {
 	ID string `json:"Id,omitempty"`
 	// These lines are context-dependent! Read the QuickBooks API carefully.
-	Line1   string `json:",omitempty"`
-	Line2   string `json:",omitempty"`
-	Line3   string `json:",omitempty"`
-	Line4   string `json:",omitempty"`
-	Line5   string `json:",omitempty"`
-	City    string `json:",omitempty"`
-	Country string `json:",omitempty"`
+	Line1   string  `json:",omitempty"`
+	Line2   *string `json:",omitempty"`
+	Line3   *string `json:",omitempty"`
+	Line4   *string `json:",omitempty"`
+	Line5   *string `json:",omitempty"`
+	City    string  `json:",omitempty"`
+	Country string  `json:",omitempty"`
 	// A.K.A. State.
 	CountrySubDivisionCode string `json:",omitempty"`
 	PostalCode             string `json:",omitempty"`
