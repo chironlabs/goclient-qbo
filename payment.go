@@ -15,7 +15,7 @@ type Payment struct {
 	ProcessPayment      bool          `json:",omitempty"`
 	Line                []PaymentLine `json:",omitempty"`
 	CustomerRef         ReferenceType `json:",omitempty"`
-	Id                  string        `json:",omitempty"`
+	ID                  string        `json:",omitempty"`
 	MetaData            MetaData      `json:",omitempty"`
 }
 
@@ -40,7 +40,7 @@ func (c *Client) CreatePayment(payment *Payment) (*Payment, error) {
 
 // DeletePayment deletes the given payment from QuickBooks.
 func (c *Client) DeletePayment(payment *Payment) error {
-	if payment.Id == "" || payment.SyncToken == "" {
+	if payment.ID == "" || payment.SyncToken == "" {
 		return errors.New("missing id/sync token")
 	}
 
@@ -122,11 +122,11 @@ func (c *Client) QueryPayments(query string) ([]Payment, error) {
 
 // UpdatePayment updates the given payment in QuickBooks.
 func (c *Client) UpdatePayment(payment *Payment) (*Payment, error) {
-	if payment.Id == "" {
+	if payment.ID == "" {
 		return nil, errors.New("missing payment id")
 	}
 
-	existingPayment, err := c.FindPaymentById(payment.Id)
+	existingPayment, err := c.FindPaymentById(payment.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -155,11 +155,11 @@ func (c *Client) UpdatePayment(payment *Payment) (*Payment, error) {
 
 // VoidPayment voids the given payment in QuickBooks.
 func (c *Client) VoidPayment(payment Payment) error {
-	if payment.Id == "" {
+	if payment.ID == "" {
 		return errors.New("missing payment id")
 	}
 
-	existingPayment, err := c.FindPaymentById(payment.Id)
+	existingPayment, err := c.FindPaymentById(payment.ID)
 	if err != nil {
 		return err
 	}

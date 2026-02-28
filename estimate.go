@@ -22,7 +22,7 @@ type Estimate struct {
 	Line                  []Line          `json:",omitempty"`
 	ApplyTaxAfterDiscount bool            `json:",omitempty"`
 	CustomField           []CustomField   `json:",omitempty"`
-	Id                    string          `json:",omitempty"`
+	ID                    string          `json:"Id,omitempty"`
 	TxnTaxDetail          TxnTaxDetail    `json:",omitempty"`
 	MetaData              MetaData        `json:",omitempty"`
 }
@@ -44,7 +44,7 @@ func (c *Client) CreateEstimate(estimate *Estimate) (*Estimate, error) {
 
 // DeleteEstimate deletes the estimate
 func (c *Client) DeleteEstimate(estimate *Estimate) error {
-	if estimate.Id == "" || estimate.SyncToken == "" {
+	if estimate.ID == "" || estimate.SyncToken == "" {
 		return errors.New("missing id/sync token")
 	}
 
@@ -137,11 +137,11 @@ func (c *Client) SendEstimate(estimateId string, emailAddress string) error {
 
 // UpdateEstimate updates the estimate
 func (c *Client) UpdateEstimate(estimate *Estimate) (*Estimate, error) {
-	if estimate.Id == "" {
+	if estimate.ID == "" {
 		return nil, errors.New("missing estimate id")
 	}
 
-	existingEstimate, err := c.FindEstimateById(estimate.Id)
+	existingEstimate, err := c.FindEstimateById(estimate.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -169,11 +169,11 @@ func (c *Client) UpdateEstimate(estimate *Estimate) (*Estimate, error) {
 }
 
 func (c *Client) VoidEstimate(estimate Estimate) error {
-	if estimate.Id == "" {
+	if estimate.ID == "" {
 		return errors.New("missing estimate id")
 	}
 
-	existingEstimate, err := c.FindEstimateById(estimate.Id)
+	existingEstimate, err := c.FindEstimateById(estimate.ID)
 	if err != nil {
 		return err
 	}

@@ -140,7 +140,7 @@ func (c *Client) RevokeToken(refreshToken string) error {
 }
 
 func basicAuth(c *Client) string {
-	return base64.StdEncoding.EncodeToString([]byte(c.clientId + ":" + c.clientSecret))
+	return base64.StdEncoding.EncodeToString([]byte(c.clientID + ":" + c.clientSecret))
 }
 
 func getBearerTokenResponse(body []byte) (*BearerToken, error) {

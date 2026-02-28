@@ -8,7 +8,7 @@ import (
 
 // Vendor describes a vendor.
 type Vendor struct {
-	Id               string       `json:"Id,omitempty"`
+	ID               string       `json:"Id,omitempty"`
 	SyncToken        string       `json:",omitempty"`
 	Title            string       `json:",omitempty"`
 	GivenName        string       `json:",omitempty"`
@@ -134,11 +134,11 @@ func (c *Client) QueryVendors(query string) ([]Vendor, error) {
 
 // UpdateVendor updates the vendor
 func (c *Client) UpdateVendor(vendor *Vendor) (*Vendor, error) {
-	if vendor.Id == "" {
+	if vendor.ID == "" {
 		return nil, errors.New("missing vendor id")
 	}
 
-	existingVendor, err := c.FindVendorById(vendor.Id)
+	existingVendor, err := c.FindVendorById(vendor.ID)
 	if err != nil {
 		return nil, err
 	}

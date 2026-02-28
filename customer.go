@@ -15,7 +15,7 @@ import (
 
 // Customer represents a QuickBooks Customer object.
 type Customer struct {
-	Id                 string          `json:",omitempty"`
+	ID                 string          `json:"Id,omitempty"`
 	SyncToken          string          `json:",omitempty"`
 	MetaData           MetaData        `json:",omitempty"`
 	Title              string          `json:",omitempty"`
@@ -194,11 +194,11 @@ func (c *Client) QueryCustomers(query string) ([]Customer, error) {
 // returning the resulting Customer object. It's a sparse update, as not all QB
 // fields are present in our Customer object.
 func (c *Client) UpdateCustomer(customer *Customer) (*Customer, error) {
-	if customer.Id == "" {
+	if customer.ID == "" {
 		return nil, errors.New("missing customer id")
 	}
 
-	existingCustomer, err := c.FindCustomerById(customer.Id)
+	existingCustomer, err := c.FindCustomerById(customer.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find existing customer: %v", err)
 	}

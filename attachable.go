@@ -37,7 +37,7 @@ const (
 )
 
 type Attachable struct {
-	Id                       string          `json:"Id,omitempty"`
+	ID                       string          `json:"Id,omitempty"`
 	SyncToken                string          `json:",omitempty"`
 	FileName                 string          `json:",omitempty"`
 	Note                     string          `json:",omitempty"`
@@ -49,11 +49,11 @@ type Attachable struct {
 	Tag                      string          `json:",omitempty"`
 	Lat                      string          `json:",omitempty"`
 	MetaData                 MetaData        `json:",omitempty"`
-	FileAccessUri            string          `json:",omitempty"`
+	FileAccessURI            string          `json:"FileAccessUri,omitempty"`
 	Size                     json.Number     `json:",omitempty"`
-	ThumbnailFileAccessUri   string          `json:",omitempty"`
-	TempDownloadUri          string          `json:",omitempty"`
-	ThumbnailTempDownloadUri string          `json:",omitempty"`
+	ThumbnailFileAccessURI   string          `json:"ThumbnailFileAccessUri,omitempty"`
+	TempDownloadURI          string          `json:"TempDownloadUri,omitempty"`
+	ThumbnailTempDownloadURI string          `json:"ThumbnailTempDownloadUri,omitempty"`
 }
 
 type AttachableRef struct {
@@ -82,7 +82,7 @@ func (c *Client) CreateAttachable(attachable *Attachable) (*Attachable, error) {
 
 // DeleteAttachable deletes the attachable
 func (c *Client) DeleteAttachable(attachable *Attachable) error {
-	if attachable.Id == "" || attachable.SyncToken == "" {
+	if attachable.ID == "" || attachable.SyncToken == "" {
 		return errors.New("missing id/sync token")
 	}
 
@@ -197,11 +197,11 @@ func (c *Client) QueryAttachables(query string) ([]Attachable, error) {
 
 // UpdateAttachable updates the attachable
 func (c *Client) UpdateAttachable(attachable *Attachable) (*Attachable, error) {
-	if attachable.Id == "" {
+	if attachable.ID == "" {
 		return nil, errors.New("missing attachable id")
 	}
 
-	existingAttachable, err := c.FindAttachableById(attachable.Id)
+	existingAttachable, err := c.FindAttachableById(attachable.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,7 @@ type Employee struct {
 	PrimaryAddr      PhysicalAddress `json:",omitempty"`
 	BillableTime     bool            `json:",omitempty"`
 	GivenName        string          `json:",omitempty"`
-	Id               string          `json:",omitempty"`
+	ID               string          `json:"Id,omitempty"`
 	MetaData         MetaData        `json:",omitempty"`
 }
 
@@ -110,11 +110,11 @@ func (c *Client) QueryEmployees(query string) ([]Employee, error) {
 
 // UpdateEmployee updates the employee
 func (c *Client) UpdateEmployee(employee *Employee) (*Employee, error) {
-	if employee.Id == "" {
+	if employee.ID == "" {
 		return nil, errors.New("missing employee id")
 	}
 
-	existingEmployee, err := c.FindEmployeeById(employee.Id)
+	existingEmployee, err := c.FindEmployeeById(employee.ID)
 	if err != nil {
 		return nil, err
 	}

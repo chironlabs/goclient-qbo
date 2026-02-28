@@ -11,7 +11,7 @@ import (
 
 // Item represents a QuickBooks Item object (a product type).
 type Item struct {
-	Id          string   `json:"Id,omitempty"`
+	ID          string   `json:"Id,omitempty"`
 	SyncToken   string   `json:",omitempty"`
 	MetaData    MetaData `json:",omitempty"`
 	Name        string
@@ -127,11 +127,11 @@ func (c *Client) QueryItems(query string) ([]Item, error) {
 
 // UpdateItem updates the item
 func (c *Client) UpdateItem(item *Item) (*Item, error) {
-	if item.Id == "" {
+	if item.ID == "" {
 		return nil, errors.New("missing item id")
 	}
 
-	existingItem, err := c.FindItemById(item.Id)
+	existingItem, err := c.FindItemById(item.ID)
 	if err != nil {
 		return nil, err
 	}

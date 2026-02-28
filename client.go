@@ -21,33 +21,33 @@ type Client struct {
 	// The set of quickbooks APIs
 	discoveryAPI *DiscoveryAPI
 	// The client Id
-	clientId string
+	clientID string
 	// The client Secret
 	clientSecret string
 	// The minor version of the QB API
 	minorVersion string
 	// The account Id you're connecting to.
-	realmId string
+	realm string
 	// Flag set if the limit of 500req/s has been hit (source: https://developer.intuit.com/app/developer/qbo/docs/learn/rest-api-features#limits-and-throttles)
 	throttled bool
 }
 
 // NewClient initializes a new QuickBooks client for interacting with their Online API
-func NewClient(clientId string, clientSecret string, realmId string, isProduction bool, minorVersion string, token *BearerToken) (c *Client, err error) {
+func NewClient(clientId string, clientSecret string, realm string, isProduction bool, minorVersion string, token *BearerToken) (c *Client, err error) {
 	if minorVersion == "" {
 		minorVersion = "65"
 	}
 
 	client := Client{
-		clientId:     clientId,
+		clientID:     clientId,
 		clientSecret: clientSecret,
 		minorVersion: minorVersion,
-		realmId:      realmId,
+		realm:        realm,
 		throttled:    false,
 	}
 
 	if isProduction {
-		client.endpoint, err = url.Parse(ProductionEndpoint.String() + "/v3/company/" + realmId + "/")
+		client.endpoint, err = url.Parse(ProductionEndpoint.String() + "/v3/company/" + realm + "/")
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse API endpoint: %v", err)
 		}
@@ -57,7 +57,7 @@ func NewClient(clientId string, clientSecret string, realmId string, isProductio
 			return nil, fmt.Errorf("failed to obtain discovery endpoint: %v", err)
 		}
 	} else {
-		client.endpoint, err = url.Parse(SandboxEndpoint.String() + "/v3/company/" + realmId + "/")
+		client.endpoint, err = url.Parse(SandboxEndpoint.String() + "/v3/company/" + realm + "/")
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse API endpoint: %v", err)
 		}
@@ -89,7 +89,7 @@ func (c *Client) FindAuthorizationUrl(scope string, state string, redirectUri st
 	}
 
 	urlValues := url.Values{}
-	urlValues.Add("client_id", c.clientId)
+	urlValues.Add("client_id", c.clientID)
 	urlValues.Add("response_type", "code")
 	urlValues.Add("scope", scope)
 	urlValues.Add("redirect_uri", redirectUri)

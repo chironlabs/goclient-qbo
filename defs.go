@@ -75,7 +75,7 @@ type MetaData struct {
 
 // PhysicalAddress represents a QuickBooks address.
 type PhysicalAddress struct {
-	Id string `json:"Id,omitempty"`
+	ID string `json:"Id,omitempty"`
 	// These lines are context-dependent! Read the QuickBooks API carefully.
 	Line1   string `json:",omitempty"`
 	Line2   string `json:",omitempty"`

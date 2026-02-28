@@ -12,7 +12,7 @@ type Deposit struct {
 	TxnDate             Date          `json:",omitempty"`
 	TotalAmt            float64       `json:",omitempty"`
 	Line                []PaymentLine `json:",omitempty"`
-	Id                  string        `json:",omitempty"`
+	ID                  string        `json:"Id,omitempty"`
 	MetaData            MetaData      `json:",omitempty"`
 }
 
@@ -31,7 +31,7 @@ func (c *Client) CreateDeposit(deposit *Deposit) (*Deposit, error) {
 }
 
 func (c *Client) DeleteDeposit(deposit *Deposit) error {
-	if deposit.Id == "" || deposit.SyncToken == "" {
+	if deposit.ID == "" || deposit.SyncToken == "" {
 		return errors.New("missing id/sync token")
 	}
 
@@ -113,11 +113,11 @@ func (c *Client) QueryDeposits(query string) ([]Deposit, error) {
 
 // UpdateDeposit updates the deposit
 func (c *Client) UpdateDeposit(deposit *Deposit) (*Deposit, error) {
-	if deposit.Id == "" {
+	if deposit.ID == "" {
 		return nil, errors.New("missing deposit id")
 	}
 
-	existingDeposit, err := c.FindDepositById(deposit.Id)
+	existingDeposit, err := c.FindDepositById(deposit.ID)
 	if err != nil {
 		return nil, err
 	}

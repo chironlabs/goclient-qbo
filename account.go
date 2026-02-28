@@ -25,7 +25,7 @@ const (
 )
 
 type Account struct {
-	Id                            string        `json:"Id,omitempty"`
+	ID                            string        `json:"Id,omitempty"`
 	Name                          string        `json:",omitempty"`
 	SyncToken                     string        `json:",omitempty"`
 	AcctNum                       string        `json:",omitempty"`
@@ -135,11 +135,11 @@ func (c *Client) QueryAccounts(query string) ([]Account, error) {
 
 // UpdateAccount updates the account
 func (c *Client) UpdateAccount(account *Account) (*Account, error) {
-	if account.Id == "" {
+	if account.ID == "" {
 		return nil, errors.New("missing account id")
 	}
 
-	existingAccount, err := c.FindAccountById(account.Id)
+	existingAccount, err := c.FindAccountById(account.ID)
 	if err != nil {
 		return nil, err
 	}

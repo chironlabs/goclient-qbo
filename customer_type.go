@@ -9,7 +9,7 @@ type CustomerType struct {
 	Domain    string   `json:"domain,omitempty"`
 	Name      string   `json:",omitempty"`
 	Active    bool     `json:",omitempty"`
-	Id        string   `json:",omitempty"`
+	ID        string   `json:"Id,omitempty"`
 	MetaData  MetaData `json:",omitempty"`
 }
 

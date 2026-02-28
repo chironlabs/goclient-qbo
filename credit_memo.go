@@ -26,7 +26,7 @@ type CreditMemo struct {
 	BillAddr              PhysicalAddress `json:",omitempty"`
 	MetaData              MetaData        `json:",omitempty"`
 	BillEmail             EmailAddress    `json:",omitempty"`
-	Id                    string          `json:",omitempty"`
+	ID                    string          `json:Id",omitempty"`
 }
 
 // CreateCreditMemo creates the given CreditMemo witin QuickBooks.
@@ -45,7 +45,7 @@ func (c *Client) CreateCreditMemo(creditMemo *CreditMemo) (*CreditMemo, error) {
 
 // DeleteCreditMemo deletes the given credit memo.
 func (c *Client) DeleteCreditMemo(creditMemo *CreditMemo) error {
-	if creditMemo.Id == "" || creditMemo.SyncToken == "" {
+	if creditMemo.ID == "" || creditMemo.SyncToken == "" {
 		return errors.New("missing id/sync token")
 	}
 
@@ -127,11 +127,11 @@ func (c *Client) QueryCreditMemos(query string) ([]CreditMemo, error) {
 
 // UpdateCreditMemo updates the given credit memo.
 func (c *Client) UpdateCreditMemo(creditMemo *CreditMemo) (*CreditMemo, error) {
-	if creditMemo.Id == "" {
+	if creditMemo.ID == "" {
 		return nil, errors.New("missing credit memo id")
 	}
 
-	existingCreditMemo, err := c.FindCreditMemoById(creditMemo.Id)
+	existingCreditMemo, err := c.FindCreditMemoById(creditMemo.ID)
 	if err != nil {
 		return nil, err
 	}

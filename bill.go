@@ -7,7 +7,7 @@ import (
 )
 
 type Bill struct {
-	Id           string        `json:"Id,omitempty"`
+	ID           string        `json:"Id,omitempty"`
 	VendorRef    ReferenceType `json:",omitempty"`
 	Line         []Line
 	SyncToken    string        `json:",omitempty"`
@@ -49,7 +49,7 @@ func (c *Client) CreateBill(bill *Bill) (*Bill, error) {
 
 // DeleteBill deletes the bill
 func (c *Client) DeleteBill(bill *Bill) error {
-	if bill.Id == "" || bill.SyncToken == "" {
+	if bill.ID == "" || bill.SyncToken == "" {
 		return errors.New("missing id/sync token")
 	}
 
@@ -131,11 +131,11 @@ func (c *Client) QueryBills(query string) ([]Bill, error) {
 
 // UpdateBill updates the bill
 func (c *Client) UpdateBill(bill *Bill) (*Bill, error) {
-	if bill.Id == "" {
+	if bill.ID == "" {
 		return nil, errors.New("missing bill id")
 	}
 
-	existingBill, err := c.FindBillById(bill.Id)
+	existingBill, err := c.FindBillById(bill.ID)
 	if err != nil {
 		return nil, err
 	}

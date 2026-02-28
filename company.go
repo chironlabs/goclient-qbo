@@ -1,28 +1,34 @@
-// Copyright (c) 2018, Randy Westlund. All rights reserved.
-// This code is under the BSD-2-Clause license.
-
 package quickbooks
 
-// CompanyInfo describes a company account.
 type CompanyInfo struct {
-	CompanyName string
-	LegalName   string
-	// CompanyAddr
-	// CustomerCommunicationAddr
-	// LegalAddr
-	// PrimaryPhone
-	// CompanyStartDate     Date
-	CompanyStartDate     string
-	FiscalYearStartMonth string
-	Country              string
-	// Email
-	// WebAddr
-	SupportedLanguages string
-	// NameValue
-	Domain    string
-	Id        string
-	SyncToken string
-	Metadata  MetaData `json:",omitempty"`
+	Id                        string
+	SyncToken                 string
+	Domain                    string `json:"domain"`
+	LegalAddr                 *PhysicalAddress
+	SupportedLanguages        *string
+	CompanyName               string
+	Country                   *string
+	CompanyAddr               PhysicalAddress
+	ID                        string `json:"Id"`
+	FiscalYearStartMonth      *string
+	CustomerCommunicationAddr *PhysicalAddress
+	PrimaryPhone              *struct {
+		FreeFormNumber *string
+	}
+	LegalName        *string
+	CompanyStartDate *string
+	EmployerID       *string `json:"EmployerId"`
+	Email            *struct {
+		Address string
+	}
+	WebAddr *struct {
+		URI *string `json:",omitempty"`
+	}
+	NameValue []struct {
+		Name  string
+		Value string
+	} `json:",omitempty"`
+	Metadata MetaData
 }
 
 // FindCompanyInfo returns the QuickBooks CompanyInfo object. This is a good
@@ -33,7 +39,7 @@ func (c *Client) FindCompanyInfo() (*CompanyInfo, error) {
 		Time        Date
 	}
 
-	if err := c.get("companyinfo/"+c.realmId, &resp, nil); err != nil {
+	if err := c.get("companyinfo/"+c.realm, &resp, nil); err != nil {
 		return nil, err
 	}
 

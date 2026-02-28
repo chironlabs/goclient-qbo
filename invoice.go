@@ -11,7 +11,7 @@ import (
 
 // Invoice represents a QuickBooks Invoice object.
 type Invoice struct {
-	Id            string        `json:"Id,omitempty"`
+	ID            string        `json:"Id,omitempty"`
 	SyncToken     string        `json:",omitempty"`
 	MetaData      MetaData      `json:",omitempty"`
 	CustomField   []CustomField `json:",omitempty"`
@@ -148,7 +148,7 @@ func (c *Client) CreateInvoice(invoice *Invoice) (*Invoice, error) {
 // happens we just return success; the goal of deleting it has been
 // accomplished, just not by us.
 func (c *Client) DeleteInvoice(invoice *Invoice) error {
-	if invoice.Id == "" || invoice.SyncToken == "" {
+	if invoice.ID == "" || invoice.SyncToken == "" {
 		return errors.New("missing id/sync token")
 	}
 
@@ -241,11 +241,11 @@ func (c *Client) SendInvoice(invoiceId string, emailAddress string) error {
 
 // UpdateInvoice updates the invoice
 func (c *Client) UpdateInvoice(invoice *Invoice) (*Invoice, error) {
-	if invoice.Id == "" {
+	if invoice.ID == "" {
 		return nil, errors.New("missing invoice id")
 	}
 
-	existingInvoice, err := c.FindInvoiceById(invoice.Id)
+	existingInvoice, err := c.FindInvoiceById(invoice.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -273,11 +273,11 @@ func (c *Client) UpdateInvoice(invoice *Invoice) (*Invoice, error) {
 }
 
 func (c *Client) VoidInvoice(invoice Invoice) error {
-	if invoice.Id == "" {
+	if invoice.ID == "" {
 		return errors.New("missing invoice id")
 	}
 
-	existingInvoice, err := c.FindInvoiceById(invoice.Id)
+	existingInvoice, err := c.FindInvoiceById(invoice.ID)
 	if err != nil {
 		return err
 	}

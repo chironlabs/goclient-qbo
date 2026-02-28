@@ -36,6 +36,6 @@ func TestAccount(t *testing.T) {
 	assert.Equal(t, json.Number("0"), r.Account.CurrentBalance)
 	assert.True(t, r.Account.Active)
 	assert.Equal(t, "0", r.Account.SyncToken)
-	assert.Equal(t, "94", r.Account.Id)
+	assert.Equal(t, "94", r.Account.ID)
 	assert.False(t, r.Account.SubAccount)
 }
