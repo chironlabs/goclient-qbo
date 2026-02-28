@@ -2,8 +2,6 @@ package quickbooks
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,12 +9,48 @@ import (
 )
 
 func TestVendor(t *testing.T) {
-	jsonFile, err := os.Open("data/testing/vendor.json")
-	require.NoError(t, err)
-	defer jsonFile.Close()
-
-	byteValue, err := ioutil.ReadAll(jsonFile)
-	require.NoError(t, err)
+	byteValue := json.RawMessage(`
+{
+  "Vendor": {
+    "PrimaryEmailAddr": {
+      "Address": "Books@Intuit.com"
+    },
+    "Vendor1099": false,
+    "domain": "QBO",
+    "GivenName": "Bessie",
+    "DisplayName": "Books by Bessie",
+    "BillAddr": {
+      "City": "Palo Alto",
+      "Line1": "15 Main St.",
+      "PostalCode": "94303",
+      "Lat": "37.445013",
+      "Long": "-122.1391443",
+      "CountrySubDivisionCode": "CA",
+      "Id": "31"
+    },
+    "SyncToken": "0",
+    "PrintOnCheckName": "Books by Bessie",
+    "FamilyName": "Williams",
+    "PrimaryPhone": {
+      "FreeFormNumber": "(650) 555-7745"
+    },
+    "AcctNum": "1345",
+    "CompanyName": "Books by Bessie",
+    "WebAddr": {
+      "URI": "http://www.booksbybessie.co"
+    },
+    "sparse": false,
+    "Active": true,
+    "Balance": 0,
+    "Id": "30",
+    "MetaData": {
+      "CreateTime": "2014-09-12T10:07:56-07:00",
+      "LastUpdatedTime": "2014-09-17T11:13:46-07:00"
+    }
+  },
+  "time": "2015-07-28T13:33:09.453-07:00"
+}
+		`)
 
 	var resp struct {
 		Vendor Vendor

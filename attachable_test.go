@@ -2,8 +2,6 @@ package quickbooks
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,12 +9,32 @@ import (
 )
 
 func TestAttachable(t *testing.T) {
-	jsonFile, err := os.Open("data/testing/attachable.json")
-	require.NoError(t, err)
-	defer jsonFile.Close()
+	byteValue := json.RawMessage(`
 
-	byteValue, err := ioutil.ReadAll(jsonFile)
-	require.NoError(t, err)
+{
+	"Attachable": {
+		"SyncToken": "0",
+		"domain": "QBO",
+		"AttachableRef": [
+			{
+				"IncludeOnSend": false,
+				"EntityRef": {
+					"type": "Invoice",
+					"value": "95"
+				}
+			}
+		],
+		"Note": "This is an attached note.",
+		"sparse": false,
+		"Id": "200900000000000008541",
+		"MetaData": {
+			"CreateTime": "2015-11-17T11:05:15-08:00",
+			"LastUpdatedTime": "2015-11-17T11:05:15-08:00"
+		}
+	},
+	"time": "2015-11-17T11:05:15.797-08:00"
+}
+		`)
 
 	var r struct {
 		Attachable Attachable
