@@ -101,8 +101,8 @@ func (c *Client) FindAccounts() ([]Account, error) {
 	return accounts, nil
 }
 
-// FindAccountById returns an account with a given Id.
-func (c *Client) FindAccountById(id string) (*Account, error) {
+// FindAccountByID returns an account with a given Id.
+func (c *Client) FindAccountByID(id string) (*Account, error) {
 	var resp struct {
 		Account Account
 		Time    Date
@@ -142,7 +142,7 @@ func (c *Client) UpdateAccount(account *Account) (*Account, error) {
 		return nil, errors.New("missing account id")
 	}
 
-	existingAccount, err := c.FindAccountById(account.ID)
+	existingAccount, err := c.FindAccountByID(account.ID)
 	if err != nil {
 		return nil, err
 	}

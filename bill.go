@@ -94,8 +94,8 @@ func (c *Client) FindBills() ([]Bill, error) {
 	return bills, nil
 }
 
-// FindBillById finds the bill by the given id
-func (c *Client) FindBillById(id string) (*Bill, error) {
+// FindBillByID finds the bill by the given id
+func (c *Client) FindBillByID(id string) (*Bill, error) {
 	var resp struct {
 		Bill Bill
 		Time Date
@@ -135,7 +135,7 @@ func (c *Client) UpdateBill(bill *Bill) (*Bill, error) {
 		return nil, errors.New("missing bill id")
 	}
 
-	existingBill, err := c.FindBillById(bill.ID)
+	existingBill, err := c.FindBillByID(bill.ID)
 	if err != nil {
 		return nil, err
 	}

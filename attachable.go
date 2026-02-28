@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -91,14 +90,14 @@ func (c *Client) DeleteAttachable(attachable *Attachable) error {
 
 // DownloadAttachable downloads the attachable
 func (c *Client) DownloadAttachable(id string) (string, error) {
-	endpointUrl := *c.endpoint
-	endpointUrl.Path += "download/" + id
+	endpointURL := *c.endpoint
+	endpointURL.Path += "download/" + id
 
 	urlValues := url.Values{}
 	urlValues.Add("minorversion", c.minorVersion)
-	endpointUrl.RawQuery = urlValues.Encode()
+	endpointURL.RawQuery = urlValues.Encode()
 
-	req, err := http.NewRequest("GET", endpointUrl.String(), nil)
+	req, err := http.NewRequest("GET", endpointURL.String(), nil)
 	if err != nil {
 		return "", err
 	}
@@ -114,7 +113,7 @@ func (c *Client) DownloadAttachable(id string) (string, error) {
 		return "", parseFailure(resp)
 	}
 
-	downloadUrl, err := ioutil.ReadAll(resp.Body)
+	downloadUrl, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -160,8 +159,8 @@ func (c *Client) FindAttachables() ([]Attachable, error) {
 	return attachables, nil
 }
 
-// FindAttachableById finds the attachable by the given id
-func (c *Client) FindAttachableById(id string) (*Attachable, error) {
+// FindAttachableByID finds the attachable by the given id
+func (c *Client) FindAttachableByID(id string) (*Attachable, error) {
 	var resp struct {
 		Attachable Attachable
 		Time       Date
@@ -201,7 +200,7 @@ func (c *Client) UpdateAttachable(attachable *Attachable) (*Attachable, error) {
 		return nil, errors.New("missing attachable id")
 	}
 
-	existingAttachable, err := c.FindAttachableById(attachable.ID)
+	existingAttachable, err := c.FindAttachableByID(attachable.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -230,12 +229,12 @@ func (c *Client) UpdateAttachable(attachable *Attachable) (*Attachable, error) {
 
 // UploadAttachable uploads the attachable
 func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (*Attachable, error) {
-	endpointUrl := *c.endpoint
-	endpointUrl.Path += "upload"
+	endpointURL := *c.endpoint
+	endpointURL.Path += "upload"
 
 	urlValues := url.Values{}
 	urlValues.Add("minorversion", c.minorVersion)
-	endpointUrl.RawQuery = urlValues.Encode()
+	endpointURL.RawQuery = urlValues.Encode()
 
 	var buffer bytes.Buffer
 	mWriter := multipart.NewWriter(&buffer)
@@ -275,7 +274,7 @@ func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (*Atta
 
 	mWriter.Close()
 
-	req, err := http.NewRequest("POST", endpointUrl.String(), &buffer)
+	req, err := http.NewRequest("POST", endpointURL.String(), &buffer)
 	if err != nil {
 		return nil, err
 	}

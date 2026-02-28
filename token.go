@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -24,7 +25,7 @@ type BearerToken struct {
 
 // RefreshToken
 // Call the refresh endpoint to generate new tokens
-func (c *Client) RefreshToken(refreshToken string) (*BearerToken, error) {
+func (c *Client) RefreshToken(refreshToken string) (t *BearerToken, e error) {
 	client := &http.Client{}
 	urlValues := url.Values{}
 	urlValues.Set("grant_type", "refresh_token")
@@ -44,9 +45,9 @@ func (c *Client) RefreshToken(refreshToken string) (*BearerToken, error) {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() { e = resp.Body.Close() }()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +65,7 @@ func (c *Client) RefreshToken(refreshToken string) (*BearerToken, error) {
 // RetrieveBearerToken
 // Method to retrieve access token (bearer token).
 // This method can only be called once
-func (c *Client) RetrieveBearerToken(authorizationCode, redirectURI string) (*BearerToken, error) {
+func (c *Client) RetrieveBearerToken(authorizationCode, redirectURI string) (t *BearerToken, e error) {
 	client := &http.Client{}
 	urlValues := url.Values{}
 	// set parameters
@@ -86,9 +87,9 @@ func (c *Client) RetrieveBearerToken(authorizationCode, redirectURI string) (*Be
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() { e = resp.Body.Close() }()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

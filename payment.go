@@ -85,8 +85,8 @@ func (c *Client) FindPayments() ([]Payment, error) {
 	return payments, nil
 }
 
-// FindPaymentById returns an payment with a given Id.
-func (c *Client) FindPaymentById(id string) (*Payment, error) {
+// FindPaymentByID returns an payment with a given Id.
+func (c *Client) FindPaymentByID(id string) (*Payment, error) {
 	var resp struct {
 		Payment Payment
 		Time    Date
@@ -126,7 +126,7 @@ func (c *Client) UpdatePayment(payment *Payment) (*Payment, error) {
 		return nil, errors.New("missing payment id")
 	}
 
-	existingPayment, err := c.FindPaymentById(payment.ID)
+	existingPayment, err := c.FindPaymentByID(payment.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func (c *Client) VoidPayment(payment Payment) error {
 		return errors.New("missing payment id")
 	}
 
-	existingPayment, err := c.FindPaymentById(payment.ID)
+	existingPayment, err := c.FindPaymentByID(payment.ID)
 	if err != nil {
 		return err
 	}

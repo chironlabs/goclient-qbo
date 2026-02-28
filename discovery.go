@@ -3,7 +3,7 @@ package quickbooks
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -13,12 +13,12 @@ type DiscoveryAPI struct {
 	TokenEndpoint         string `json:"token_endpoint"`
 	UserinfoEndpoint      string `json:"userinfo_endpoint"`
 	RevocationEndpoint    string `json:"revocation_endpoint"`
-	JwksUri               string `json:"jwks_uri"`
+	JwksURI               string `json:"jwks_uri"`
 }
 
 // CallDiscoveryAPI
 // See https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/openid-connect#discovery-document
-func CallDiscoveryAPI(discoveryEndpoint EndpointURL) (*DiscoveryAPI, error) {
+func CallDiscoveryAPI(discoveryEndpoint EndpointURL) (res *DiscoveryAPI, e error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", string(discoveryEndpoint), nil)
 	if err != nil {
@@ -32,9 +32,11 @@ func CallDiscoveryAPI(discoveryEndpoint EndpointURL) (*DiscoveryAPI, error) {
 		return nil, fmt.Errorf("failed to make req: %v", err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		e = resp.Body.Close()
+	}()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read body: %v", err)
 	}

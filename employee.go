@@ -73,8 +73,8 @@ func (c *Client) FindEmployees() ([]Employee, error) {
 	return employees, nil
 }
 
-// FindEmployeeById returns an employee with a given Id.
-func (c *Client) FindEmployeeById(id string) (*Employee, error) {
+// FindEmployeeByID returns an employee with a given Id.
+func (c *Client) FindEmployeeByID(id string) (*Employee, error) {
 	var resp struct {
 		Employee Employee
 		Time     Date
@@ -114,7 +114,7 @@ func (c *Client) UpdateEmployee(employee *Employee) (*Employee, error) {
 		return nil, errors.New("missing employee id")
 	}
 
-	existingEmployee, err := c.FindEmployeeById(employee.ID)
+	existingEmployee, err := c.FindEmployeeByID(employee.ID)
 	if err != nil {
 		return nil, err
 	}

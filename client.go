@@ -74,15 +74,15 @@ func NewClient(clientId string, clientSecret string, realm string, isProduction 
 	return &client, nil
 }
 
-// FindAuthorizationUrl compiles the authorization url from the discovery api's auth endpoint.
+// FindAuthorizationURL compiles the authorization url from the discovery api's auth endpoint.
 //
-// Example: qbClient.FindAuthorizationUrl("com.intuit.quickbooks.accounting", "security_token", "https://developer.intuit.com/v2/OAuth2Playground/RedirectUrl")
+// Example: qbClient.FindAuthorizationURL("com.intuit.quickbooks.accounting", "security_token", "https://developer.intuit.com/v2/OAuth2Playground/RedirectUrl")
 //
 // You can find live examples from https://developer.intuit.com/app/developer/playground
-func (c *Client) FindAuthorizationUrl(scope string, state string, redirectUri string) (string, error) {
-	var authorizationUrl *url.URL
+func (c *Client) FindAuthorizationURL(scope string, state string, redirectUri string) (string, error) {
+	var authorizationURL *url.URL
 
-	authorizationUrl, err := url.Parse(c.discoveryAPI.AuthorizationEndpoint)
+	authorizationURL, err := url.Parse(c.discoveryAPI.AuthorizationEndpoint)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse auth endpoint: %v", err)
 	}
@@ -93,19 +93,19 @@ func (c *Client) FindAuthorizationUrl(scope string, state string, redirectUri st
 	urlValues.Add("scope", scope)
 	urlValues.Add("redirect_uri", redirectUri)
 	urlValues.Add("state", state)
-	authorizationUrl.RawQuery = urlValues.Encode()
+	authorizationURL.RawQuery = urlValues.Encode()
 
-	return authorizationUrl.String(), nil
+	return authorizationURL.String(), nil
 }
 
-func (c *Client) req(method string, endpoint string, payloadData interface{}, responseObject interface{}, queryParameters map[string]string) error {
+func (c *Client) req(method string, endpoint string, payloadData interface{}, responseObject interface{}, queryParameters map[string]string) (e error) {
 	// TODO: possibly just wait until c.throttled is false, and continue the request?
 	if c.throttled {
 		return errors.New("waiting for rate limit")
 	}
 
-	endpointUrl := *c.endpoint
-	endpointUrl.Path += endpoint
+	endpointURL := *c.endpoint
+	endpointURL.Path += endpoint
 	urlValues := url.Values{}
 
 	if len(queryParameters) > 0 {
@@ -116,7 +116,7 @@ func (c *Client) req(method string, endpoint string, payloadData interface{}, re
 
 	urlValues.Set("minorversion", c.minorVersion)
 	urlValues.Encode()
-	endpointUrl.RawQuery = urlValues.Encode()
+	endpointURL.RawQuery = urlValues.Encode()
 
 	var err error
 	var marshalledJson []byte
@@ -128,7 +128,7 @@ func (c *Client) req(method string, endpoint string, payloadData interface{}, re
 		}
 	}
 
-	req, err := http.NewRequest(method, endpointUrl.String(), bytes.NewBuffer(marshalledJson))
+	req, err := http.NewRequest(method, endpointURL.String(), bytes.NewBuffer(marshalledJson))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}
@@ -141,7 +141,9 @@ func (c *Client) req(method string, endpoint string, payloadData interface{}, re
 		return fmt.Errorf("failed to make request: %v", err)
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		e = resp.Body.Close()
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusOK:

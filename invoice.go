@@ -78,7 +78,7 @@ type AccountBasedExpenseLineDetail struct {
 }
 
 type Line struct {
-	Id                            string `json:",omitempty"`
+	ID                            string `json:",omitempty"`
 	LineNum                       int    `json:",omitempty"`
 	Description                   string `json:",omitempty"`
 	Amount                        json.Number
@@ -190,8 +190,8 @@ func (c *Client) FindInvoices() ([]Invoice, error) {
 	return invoices, nil
 }
 
-// FindInvoiceById finds the invoice by the given id
-func (c *Client) FindInvoiceById(id string) (*Invoice, error) {
+// FindInvoiceByID finds the invoice by the given id
+func (c *Client) FindInvoiceByID(id string) (*Invoice, error) {
 	var resp struct {
 		Invoice Invoice
 		Time    Date
@@ -242,7 +242,7 @@ func (c *Client) UpdateInvoice(invoice *Invoice) (*Invoice, error) {
 		return nil, errors.New("missing invoice id")
 	}
 
-	existingInvoice, err := c.FindInvoiceById(invoice.ID)
+	existingInvoice, err := c.FindInvoiceByID(invoice.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func (c *Client) VoidInvoice(invoice Invoice) error {
 		return errors.New("missing invoice id")
 	}
 
-	existingInvoice, err := c.FindInvoiceById(invoice.ID)
+	existingInvoice, err := c.FindInvoiceByID(invoice.ID)
 	if err != nil {
 		return err
 	}
