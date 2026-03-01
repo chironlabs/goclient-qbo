@@ -44,7 +44,7 @@ func TestAttachable(t *testing.T) {
 	require.NoError(t, json.Unmarshal(byteValue, &r))
 
 	assert.Equal(t, "0", r.Attachable.SyncToken)
-	assert.False(t, r.Attachable.AttachableRef[0].IncludeOnSend)
+	assert.False(t, *r.Attachable.AttachableRef[0].IncludeOnSend)
 	assert.Equal(t, "95", r.Attachable.AttachableRef[0].EntityRef.Value)
 	assert.Equal(t, "This is an attached note.", r.Attachable.Note)
 	assert.Equal(t, "200900000000000008541", r.Attachable.ID)
