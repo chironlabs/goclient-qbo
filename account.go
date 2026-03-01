@@ -24,39 +24,60 @@ const (
 	OtherIncomeAccountType           = "Other Income"
 )
 
+// Account represents a QuickBooks Account object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData, FullyQualifiedName, Classification,
+// CurrentBalance, CurrentBalanceWithSubAccounts) are populated by the service.
 type Account struct {
-	ID                 string         `json:"Id,omitempty"`
-	Name               string         `json:",omitempty"`
-	SyncToken          string         `json:",omitempty"`
-	AcctNum            *string        `json:",omitempty"`
-	CurrencyRef        *ReferenceType `json:",omitempty"`
-	ParentRef          *ReferenceType `json:",omitempty"`
-	Description        *string        `json:",omitempty"`
-	Active             *bool          `json:",omitempty"`
-	MetaData           *MetaData      `json:",omitempty"`
-	SubAccount         bool           `json:",omitempty"`
-	Classification     string         `json:",omitempty"`
-	FullyQualifiedName string         `json:",omitempty"`
-	// for France locale only: Values -> WithinFrance, FranceOverseas, OutsideFranceWithEU, OutsideEU
-	TxnLocationType               *string     `json:",omitempty"`
-	AccountType                   string      `json:",omitempty"`
-	CurrentBalanceWithSubAccounts json.Number `json:",omitempty"`
-	AccountAlias                  string      `json:",omitempty"`
-
-	//	For global locale
-	TaxCodeRef     ReferenceType `json:",omitempty"`
-	AccountSubType string        `json:",omitempty"`
-	CurrentBalance json.Number   `json:",omitempty"`
+	ID                            string         `json:"Id,omitempty"`
+	SyncToken                     string         `json:",omitempty"`
+	MetaData                      *MetaData      `json:",omitempty"`
+	Name                          string         `json:",omitempty"`
+	FullyQualifiedName            string         `json:",omitempty"`
+	Classification                string         `json:",omitempty"`
+	AccountType                   string         `json:",omitempty"`
+	AccountSubType                string         `json:",omitempty"`
+	CurrentBalance                json.Number    `json:",omitempty"`
+	CurrentBalanceWithSubAccounts json.Number    `json:",omitempty"`
+	SubAccount                    bool           `json:",omitempty"`
+	Active                        *bool          `json:",omitempty"`
+	AcctNum                       *string        `json:",omitempty"`
+	Description                   *string        `json:",omitempty"`
+	ParentRef                     *ReferenceType `json:",omitempty"`
+	CurrencyRef                   *ReferenceType `json:",omitempty"`
+	// TaxCodeRef is used for global locales only.
+	TaxCodeRef *ReferenceType `json:",omitempty"`
+	// TxnLocationType is used for France locale only.
+	// Valid values: WithinFrance, FranceOverseas, OutsideFranceWithEU, OutsideEU
+	TxnLocationType *string `json:",omitempty"`
+	AccountAlias    *string `json:",omitempty"`
 }
 
-// CreateAccount creates the given account within QuickBooks
-func (c *Client) CreateAccount(account *Account) (*Account, error) {
+// AccountCreateInput contains the writable fields accepted when creating an Account.
+// Name and AccountType are required; all other fields are optional.
+type AccountCreateInput struct {
+	Name        string `json:",omitempty"`
+	AccountType string `json:",omitempty"`
+	// AccountSubType defaults to the first sub-type for the given AccountType if omitted.
+	AccountSubType  *string        `json:",omitempty"`
+	AcctNum         *string        `json:",omitempty"`
+	Active          *bool          `json:",omitempty"`
+	Description     *string        `json:",omitempty"`
+	ParentRef       *ReferenceType `json:",omitempty"`
+	SubAccount      *bool          `json:",omitempty"`
+	CurrencyRef     *ReferenceType `json:",omitempty"`
+	TaxCodeRef      *ReferenceType `json:",omitempty"`
+	TxnLocationType *string        `json:",omitempty"`
+	AccountAlias    *string        `json:",omitempty"`
+}
+
+// CreateAccount creates the given account within QuickBooks.
+func (c *Client) CreateAccount(input *AccountCreateInput) (*Account, error) {
 	var resp struct {
 		Account Account
 		Time    Date
 	}
 
-	if err := c.post("account", account, &resp, nil); err != nil {
+	if err := c.post("account", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
