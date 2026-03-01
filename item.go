@@ -142,6 +142,15 @@ func (c *Client) QueryItems(query string) ([]Item, error) {
 	return resp.QueryResponse.Items, nil
 }
 
+// DeleteItem deletes the item.
+func (c *Client) DeleteItem(item *Item) error {
+	if item.ID == "" || item.SyncToken == "" {
+		return errors.New("missing id/sync token")
+	}
+
+	return c.post("item", item, nil, map[string]string{"operation": "delete"})
+}
+
 // UpdateItem updates the item
 func (c *Client) UpdateItem(item *Item) (*Item, error) {
 	if item.ID == "" {

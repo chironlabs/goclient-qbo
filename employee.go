@@ -122,6 +122,15 @@ func (c *Client) QueryEmployees(query string) ([]Employee, error) {
 	return resp.QueryResponse.Employees, nil
 }
 
+// DeleteEmployee deletes the employee.
+func (c *Client) DeleteEmployee(employee *Employee) error {
+	if employee.ID == "" || employee.SyncToken == "" {
+		return errors.New("missing id/sync token")
+	}
+
+	return c.post("employee", employee, nil, map[string]string{"operation": "delete"})
+}
+
 // UpdateEmployee updates the employee
 func (c *Client) UpdateEmployee(employee *Employee) (*Employee, error) {
 	if employee.ID == "" {

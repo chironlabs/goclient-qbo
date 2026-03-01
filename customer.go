@@ -214,6 +214,15 @@ func (c *Client) QueryCustomers(query string) ([]Customer, error) {
 	return resp.QueryResponse.Customers, nil
 }
 
+// DeleteCustomer deletes the customer.
+func (c *Client) DeleteCustomer(customer *Customer) error {
+	if customer.ID == "" || customer.SyncToken == "" {
+		return errors.New("missing id/sync token")
+	}
+
+	return c.post("customer", customer, nil, map[string]string{"operation": "delete"})
+}
+
 // UpdateCustomer updates the given Customer on the QuickBooks server,
 // returning the resulting Customer object. It's a sparse update, as not all QB
 // fields are present in our Customer object.

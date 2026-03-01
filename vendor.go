@@ -164,6 +164,15 @@ func (c *Client) QueryVendors(query string) ([]Vendor, error) {
 	return resp.QueryResponse.Vendors, nil
 }
 
+// DeleteVendor deletes the vendor.
+func (c *Client) DeleteVendor(vendor *Vendor) error {
+	if vendor.ID == "" || vendor.SyncToken == "" {
+		return errors.New("missing id/sync token")
+	}
+
+	return c.post("vendor", vendor, nil, map[string]string{"operation": "delete"})
+}
+
 // UpdateVendor updates the vendor
 func (c *Client) UpdateVendor(vendor *Vendor) (*Vendor, error) {
 	if vendor.ID == "" {

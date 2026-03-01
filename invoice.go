@@ -102,20 +102,57 @@ type TxnTaxDetail struct {
 }
 
 type AccountBasedExpenseLineDetail struct {
-	AccountRef ReferenceType
-	TaxAmount  json.Number `json:",omitempty"`
+	AccountRef     ReferenceType
+	CustomerRef    *ReferenceType `json:",omitempty"`
+	ClassRef       *ReferenceType `json:",omitempty"`
+	DepartmentRef  *ReferenceType `json:",omitempty"`
+	TaxCodeRef     *ReferenceType `json:",omitempty"`
+	TaxAmount      json.Number    `json:",omitempty"`
+	BillableStatus *string        `json:",omitempty"`
+}
+
+// JournalEntryLineDetail holds the detail for a JournalEntry line.
+type JournalEntryLineDetail struct {
+	PostingType     string         // "Debit" or "Credit"
+	AccountRef      ReferenceType
+	ClassRef        *ReferenceType `json:",omitempty"`
+	DepartmentRef   *ReferenceType `json:",omitempty"`
+	TaxCodeRef      *ReferenceType `json:",omitempty"`
+	Entity          *EntityTypeRef `json:",omitempty"`
+	BillableStatus  *string        `json:",omitempty"`
+	TaxApplicableOn *string        `json:",omitempty"`
+}
+
+// EntityTypeRef is used in JournalEntryLineDetail to reference an entity (customer, vendor, etc.).
+type EntityTypeRef struct {
+	Type      string        `json:",omitempty"`
+	EntityRef ReferenceType `json:",omitempty"`
+}
+
+// ItemBasedExpenseLineDetail holds the detail for an item-based expense line (used in PurchaseOrder).
+type ItemBasedExpenseLineDetail struct {
+	ItemRef         ReferenceType
+	ClassRef        *ReferenceType `json:",omitempty"`
+	UnitPrice       json.Number    `json:",omitempty"`
+	Qty             json.Number    `json:",omitempty"`
+	TaxCodeRef      *ReferenceType `json:",omitempty"`
+	CustomerRef     *ReferenceType `json:",omitempty"`
+	BillableStatus  *string        `json:",omitempty"`
+	TaxInclusiveAmt json.Number    `json:",omitempty"`
 }
 
 type Line struct {
-	ID                            string      `json:"Id,omitempty"`
-	LineNum                       int         `json:",omitempty"`
-	Description                   string      `json:",omitempty"`
+	ID                            string                     `json:"Id,omitempty"`
+	LineNum                       int                        `json:",omitempty"`
+	Description                   string                     `json:",omitempty"`
 	Amount                        json.Number
 	DetailType                    string
 	AccountBasedExpenseLineDetail AccountBasedExpenseLineDetail `json:",omitempty"`
 	SalesItemLineDetail           SalesItemLineDetail           `json:",omitempty"`
 	DiscountLineDetail            DiscountLineDetail            `json:",omitempty"`
-	TaxLineDetail                 TaxLineDetail                 `json:",omitempty"`
+	TaxLineDetail                 TaxLineDetail                `json:",omitempty"`
+	JournalEntryLineDetail        JournalEntryLineDetail       `json:",omitempty"`
+	ItemBasedExpenseLineDetail    ItemBasedExpenseLineDetail   `json:",omitempty"`
 }
 
 // TaxLineDetail ...
