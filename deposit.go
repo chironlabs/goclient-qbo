@@ -1,29 +1,39 @@
 package quickbooks
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 )
 
+// Deposit represents a QuickBooks Deposit object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData, TotalAmt) are populated by the service.
 type Deposit struct {
-	SyncToken           string        `json:",omitempty"`
-	Domain              string        `json:"domain,omitempty"`
-	DepositToAccountRef ReferenceType `json:",omitempty"`
-	TxnDate             Date          `json:",omitempty"`
-	TotalAmt            float64       `json:",omitempty"`
-	Line                []PaymentLine `json:",omitempty"`
 	ID                  string        `json:"Id,omitempty"`
-	MetaData            MetaData      `json:",omitempty"`
+	SyncToken           string        `json:",omitempty"`
+	MetaData            *MetaData     `json:",omitempty"`
+	DepositToAccountRef ReferenceType `json:",omitempty"`
+	TxnDate             *Date         `json:",omitempty"`
+	TotalAmt            json.Number   `json:",omitempty"`
+	Line                []PaymentLine `json:",omitempty"`
+}
+
+// DepositCreateInput contains the writable fields accepted when creating a Deposit.
+// DepositToAccountRef and Line are required; all other fields are optional.
+type DepositCreateInput struct {
+	DepositToAccountRef ReferenceType `json:",omitempty"`
+	Line                []PaymentLine
+	TxnDate             *Date `json:",omitempty"`
 }
 
 // CreateDeposit creates the given deposit within QuickBooks
-func (c *Client) CreateDeposit(deposit *Deposit) (*Deposit, error) {
+func (c *Client) CreateDeposit(input *DepositCreateInput) (*Deposit, error) {
 	var resp struct {
 		Deposit Deposit
 		Time    Date
 	}
 
-	if err := c.post("deposit", deposit, &resp, nil); err != nil {
+	if err := c.post("deposit", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
@@ -76,8 +86,8 @@ func (c *Client) FindDeposits() ([]Deposit, error) {
 	return deposits, nil
 }
 
-// FindDepositById returns an deposit with a given Id.
-func (c *Client) FindDepositById(id string) (*Deposit, error) {
+// FindDepositByID returns a deposit with a given Id.
+func (c *Client) FindDepositByID(id string) (*Deposit, error) {
 	var resp struct {
 		Deposit Deposit
 		Time    Date
@@ -117,7 +127,7 @@ func (c *Client) UpdateDeposit(deposit *Deposit) (*Deposit, error) {
 		return nil, errors.New("missing deposit id")
 	}
 
-	existingDeposit, err := c.FindDepositById(deposit.ID)
+	existingDeposit, err := c.FindDepositByID(deposit.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -6,48 +6,83 @@ import (
 	"strconv"
 )
 
-// Invoice represents a QuickBooks Invoice object.
+// Invoice represents a QuickBooks Invoice object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData, TotalAmt, HomeAmtTotal, HomeBalance,
+// Balance, TxnSource, LinkedTxn) are populated by the service.
 type Invoice struct {
 	ID            string        `json:"Id,omitempty"`
 	SyncToken     string        `json:",omitempty"`
-	MetaData      MetaData      `json:",omitempty"`
+	MetaData      *MetaData     `json:",omitempty"`
 	CustomField   []CustomField `json:",omitempty"`
-	DocNumber     string        `json:",omitempty"`
-	TxnDate       Date          `json:",omitempty"`
-	DepartmentRef ReferenceType `json:",omitempty"`
-	PrivateNote   string        `json:",omitempty"`
+	DocNumber     *string       `json:",omitempty"`
+	TxnDate       *Date         `json:",omitempty"`
+	DepartmentRef *ReferenceType `json:",omitempty"`
+	PrivateNote   *string       `json:",omitempty"`
 	LinkedTxn     []LinkedTxn   `json:"LinkedTxn"`
 	Line          []Line
-	TxnTaxDetail  TxnTaxDetail `json:",omitempty"`
+	TxnTaxDetail  *TxnTaxDetail  `json:",omitempty"`
 	CustomerRef   ReferenceType
-	CustomerMemo  MemoRef       `json:",omitempty"`
-	BillAddr      Address       `json:",omitempty"`
-	ShipAddr      Address       `json:",omitempty"`
-	ClassRef      ReferenceType `json:",omitempty"`
-	SalesTermRef  ReferenceType `json:",omitempty"`
-	DueDate       Date          `json:",omitempty"`
-	// GlobalTaxCalculation
-	ShipMethodRef                ReferenceType `json:",omitempty"`
-	ShipDate                     Date          `json:",omitempty"`
-	TrackingNum                  string        `json:",omitempty"`
-	TotalAmt                     json.Number   `json:",omitempty"`
-	CurrencyRef                  ReferenceType `json:",omitempty"`
-	ExchangeRate                 json.Number   `json:",omitempty"`
-	HomeAmtTotal                 json.Number   `json:",omitempty"`
-	HomeBalance                  json.Number   `json:",omitempty"`
-	ApplyTaxAfterDiscount        bool          `json:",omitempty"`
-	PrintStatus                  string        `json:",omitempty"`
-	EmailStatus                  string        `json:",omitempty"`
-	BillEmail                    EmailAddress  `json:",omitempty"`
-	BillEmailCC                  EmailAddress  `json:"BillEmailCc,omitempty"`
-	BillEmailBCC                 EmailAddress  `json:"BillEmailBcc,omitempty"`
-	DeliveryInfo                 *DeliveryInfo `json:",omitempty"`
-	Balance                      json.Number   `json:",omitempty"`
-	TxnSource                    string        `json:",omitempty"`
-	AllowOnlineCreditCardPayment bool          `json:",omitempty"`
-	AllowOnlineACHPayment        bool          `json:",omitempty"`
+	CustomerMemo  *MemoRef       `json:",omitempty"`
+	BillAddr      *Address       `json:",omitempty"`
+	ShipAddr      *Address       `json:",omitempty"`
+	ClassRef      *ReferenceType `json:",omitempty"`
+	SalesTermRef  *ReferenceType `json:",omitempty"`
+	DueDate       *Date          `json:",omitempty"`
+	ShipMethodRef *ReferenceType `json:",omitempty"`
+	ShipDate      *Date          `json:",omitempty"`
+	TrackingNum   *string        `json:",omitempty"`
+	TotalAmt      json.Number    `json:",omitempty"`
+	CurrencyRef   *ReferenceType `json:",omitempty"`
+	ExchangeRate  json.Number    `json:",omitempty"`
+	HomeAmtTotal  json.Number    `json:",omitempty"`
+	HomeBalance   json.Number    `json:",omitempty"`
+	ApplyTaxAfterDiscount        *bool          `json:",omitempty"`
+	PrintStatus                  *string        `json:",omitempty"`
+	EmailStatus                  *string        `json:",omitempty"`
+	BillEmail                    *EmailAddress  `json:",omitempty"`
+	BillEmailCC                  *EmailAddress  `json:"BillEmailCc,omitempty"`
+	BillEmailBCC                 *EmailAddress  `json:"BillEmailBcc,omitempty"`
+	DeliveryInfo                 *DeliveryInfo  `json:",omitempty"`
+	Balance                      json.Number    `json:",omitempty"`
+	TxnSource                    *string        `json:",omitempty"`
+	AllowOnlineCreditCardPayment *bool          `json:",omitempty"`
+	AllowOnlineACHPayment        *bool          `json:",omitempty"`
+	Deposit                      json.Number    `json:",omitempty"`
+	DepositToAccountRef          *ReferenceType `json:",omitempty"`
+}
+
+// InvoiceCreateInput contains the writable fields accepted when creating an Invoice.
+// CustomerRef and Line are required; all other fields are optional.
+type InvoiceCreateInput struct {
+	CustomerRef   ReferenceType
+	Line          []Line
+	DocNumber     *string        `json:",omitempty"`
+	TxnDate       *Date          `json:",omitempty"`
+	DepartmentRef *ReferenceType `json:",omitempty"`
+	PrivateNote   *string        `json:",omitempty"`
+	TxnTaxDetail  *TxnTaxDetail  `json:",omitempty"`
+	CustomerMemo  *MemoRef       `json:",omitempty"`
+	BillAddr      *Address       `json:",omitempty"`
+	ShipAddr      *Address       `json:",omitempty"`
+	ClassRef      *ReferenceType `json:",omitempty"`
+	SalesTermRef  *ReferenceType `json:",omitempty"`
+	DueDate       *Date          `json:",omitempty"`
+	ShipMethodRef *ReferenceType `json:",omitempty"`
+	ShipDate      *Date          `json:",omitempty"`
+	TrackingNum   *string        `json:",omitempty"`
+	CurrencyRef   *ReferenceType `json:",omitempty"`
+	ExchangeRate  json.Number    `json:",omitempty"`
+	ApplyTaxAfterDiscount        *bool         `json:",omitempty"`
+	PrintStatus                  *string       `json:",omitempty"`
+	EmailStatus                  *string       `json:",omitempty"`
+	BillEmail                    *EmailAddress `json:",omitempty"`
+	BillEmailCC                  *EmailAddress `json:"BillEmailCc,omitempty"`
+	BillEmailBCC                 *EmailAddress `json:"BillEmailBcc,omitempty"`
+	AllowOnlineCreditCardPayment *bool         `json:",omitempty"`
+	AllowOnlineACHPayment        *bool         `json:",omitempty"`
 	Deposit                      json.Number   `json:",omitempty"`
-	DepositToAccountRef          ReferenceType `json:",omitempty"`
+	DepositToAccountRef          *ReferenceType `json:",omitempty"`
+	CustomField                  []CustomField  `json:",omitempty"`
 }
 
 type DeliveryInfo struct {
@@ -69,18 +104,12 @@ type TxnTaxDetail struct {
 type AccountBasedExpenseLineDetail struct {
 	AccountRef ReferenceType
 	TaxAmount  json.Number `json:",omitempty"`
-	// TaxInclusiveAmt json.Number              `json:",omitempty"`
-	// ClassRef        ReferenceType `json:",omitempty"`
-	// TaxCodeRef      ReferenceType `json:",omitempty"`
-	// MarkupInfo MarkupInfo `json:",omitempty"`
-	// BillableStatus BillableStatusEnum       `json:",omitempty"`
-	// CustomerRef    ReferenceType `json:",omitempty"`
 }
 
 type Line struct {
-	ID                            string `json:",omitempty"`
-	LineNum                       int    `json:",omitempty"`
-	Description                   string `json:",omitempty"`
+	ID                            string      `json:"Id,omitempty"`
+	LineNum                       int         `json:",omitempty"`
+	Description                   string      `json:",omitempty"`
 	Amount                        json.Number
 	DetailType                    string
 	AccountBasedExpenseLineDetail AccountBasedExpenseLineDetail `json:",omitempty"`
@@ -91,44 +120,41 @@ type Line struct {
 
 // TaxLineDetail ...
 type TaxLineDetail struct {
-	PercentBased     bool        `json:",omitempty"`
+	PercentBased     *bool       `json:",omitempty"`
 	NetAmountTaxable json.Number `json:",omitempty"`
-	// TaxInclusiveAmount json.Number `json:",omitempty"`
-	// OverrideDeltaAmount
-	TaxPercent json.Number `json:",omitempty"`
-	TaxRateRef ReferenceType
+	TaxPercent       json.Number `json:",omitempty"`
+	TaxRateRef       ReferenceType
 }
 
 // SalesItemLineDetail ...
 type SalesItemLineDetail struct {
-	ItemRef   ReferenceType `json:",omitempty"`
-	ClassRef  ReferenceType `json:",omitempty"`
-	UnitPrice json.Number   `json:",omitempty"`
-	// MarkupInfo
-	Qty             float32       `json:",omitempty"`
-	ItemAccountRef  ReferenceType `json:",omitempty"`
-	TaxCodeRef      ReferenceType `json:",omitempty"`
-	ServiceDate     Date          `json:",omitempty"`
+	ItemRef        *ReferenceType `json:",omitempty"`
+	ClassRef       *ReferenceType `json:",omitempty"`
+	UnitPrice      json.Number    `json:",omitempty"`
+	Qty            json.Number    `json:",omitempty"`
+	ItemAccountRef *ReferenceType `json:",omitempty"`
+	TaxCodeRef     *ReferenceType `json:",omitempty"`
+	ServiceDate    *Date          `json:",omitempty"`
 	TaxInclusiveAmt json.Number   `json:",omitempty"`
-	DiscountRate    json.Number   `json:",omitempty"`
-	DiscountAmt     json.Number   `json:",omitempty"`
+	DiscountRate   json.Number    `json:",omitempty"`
+	DiscountAmt    json.Number    `json:",omitempty"`
 }
 
 // DiscountLineDetail ...
 type DiscountLineDetail struct {
-	PercentBased    bool
-	DiscountPercent float32 `json:",omitempty"`
+	PercentBased    *bool       `json:",omitempty"`
+	DiscountPercent json.Number `json:",omitempty"`
 }
 
 // CreateInvoice creates the given Invoice on the QuickBooks server, returning
 // the resulting Invoice object.
-func (c *Client) CreateInvoice(invoice *Invoice) (*Invoice, error) {
+func (c *Client) CreateInvoice(input *InvoiceCreateInput) (*Invoice, error) {
 	var resp struct {
 		Invoice Invoice
 		Time    Date
 	}
 
-	if err := c.post("invoice", invoice, &resp, nil); err != nil {
+	if err := c.post("invoice", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
@@ -269,7 +295,7 @@ func (c *Client) UpdateInvoice(invoice *Invoice) (*Invoice, error) {
 	return &invoiceData.Invoice, err
 }
 
-func (c *Client) VoidInvoice(invoice Invoice) error {
+func (c *Client) VoidInvoice(invoice *Invoice) error {
 	if invoice.ID == "" {
 		return errors.New("missing invoice id")
 	}

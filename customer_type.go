@@ -4,17 +4,18 @@ import (
 	"errors"
 )
 
+// CustomerType represents a QuickBooks CustomerType object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData) are populated by the service.
 type CustomerType struct {
-	SyncToken string   `json:",omitempty"`
-	Domain    string   `json:"domain,omitempty"`
-	Name      string   `json:",omitempty"`
-	Active    bool     `json:",omitempty"`
-	ID        string   `json:"Id,omitempty"`
-	MetaData  MetaData `json:",omitempty"`
+	ID        string    `json:"Id,omitempty"`
+	SyncToken string    `json:",omitempty"`
+	MetaData  *MetaData `json:",omitempty"`
+	Name      string    `json:",omitempty"`
+	Active    *bool     `json:",omitempty"`
 }
 
-// FindCustomerTypeById returns a customerType with a given Id.
-func (c *Client) FindCustomerTypeById(id string) (*CustomerType, error) {
+// FindCustomerTypeByID returns a customerType with a given Id.
+func (c *Client) FindCustomerTypeByID(id string) (*CustomerType, error) {
 	var r struct {
 		CustomerType CustomerType
 		Time         Date

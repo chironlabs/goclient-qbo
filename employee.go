@@ -5,34 +5,44 @@ import (
 	"strconv"
 )
 
+// Employee represents a QuickBooks Employee object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData) are populated by the service.
 type Employee struct {
-	SyncToken        string `json:",omitempty"`
-	Domain           string `json:"domain,omitempty"`
-	DisplayName      string `json:",omitempty"`
-	PrintOnCheckName string `json:",omitempty"`
-	FamilyName       string `json:",omitempty"`
-	Active           bool
+	ID               string    `json:"Id,omitempty"`
+	SyncToken        string    `json:",omitempty"`
+	MetaData         *MetaData `json:",omitempty"`
+	DisplayName      string    `json:",omitempty"`
+	PrintOnCheckName *string   `json:",omitempty"`
+	FamilyName       string    `json:",omitempty"`
+	GivenName        string    `json:",omitempty"`
+	Active           *bool     `json:",omitempty"`
+	BillableTime     *bool     `json:",omitempty"`
 
-	//	ignoring these fields on purpose, if you want to sync in PII for whatever reason
-	//	you can fork this PR and unmarshal it, but you probably shouldn't
+	// PII fields are intentionally excluded from serialization.
 	SSN          *string         `json:"-"`
 	PrimaryAddr  *Address        `json:"-"`
 	PrimaryPhone TelephoneNumber `json:"-"`
+}
 
-	BillableTime bool     `json:",omitempty"`
-	GivenName    string   `json:",omitempty"`
-	ID           string   `json:"Id,omitempty"`
-	MetaData     MetaData `json:",omitempty"`
+// EmployeeCreateInput contains the writable fields accepted when creating an Employee.
+// At least one of GivenName, FamilyName, or DisplayName is required.
+type EmployeeCreateInput struct {
+	GivenName        string  `json:",omitempty"`
+	FamilyName       string  `json:",omitempty"`
+	DisplayName      string  `json:",omitempty"`
+	PrintOnCheckName *string `json:",omitempty"`
+	Active           *bool   `json:",omitempty"`
+	BillableTime     *bool   `json:",omitempty"`
 }
 
 // CreateEmployee creates the given employee within QuickBooks
-func (c *Client) CreateEmployee(employee *Employee) (*Employee, error) {
+func (c *Client) CreateEmployee(input *EmployeeCreateInput) (*Employee, error) {
 	var resp struct {
 		Employee Employee
 		Time     Date
 	}
 
-	if err := c.post("employee", employee, &resp, nil); err != nil {
+	if err := c.post("employee", input, &resp, nil); err != nil {
 		return nil, err
 	}
 

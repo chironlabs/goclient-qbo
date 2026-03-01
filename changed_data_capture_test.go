@@ -1,6 +1,7 @@
 package quickbooks
 
 import (
+	"encoding/json"
 	"net/http"
 	"testing"
 	"time"
@@ -57,7 +58,7 @@ func TestGetChangedEntities(t *testing.T) {
 	assert.Nil(t, result.Estimates[0].Deleted)
 	assert.NotNil(t, result.Estimates[0].Entity)
 	assert.Equal(t, "48", result.Estimates[0].Entity.ID)
-	assert.Equal(t, float64(1005), result.Estimates[0].Entity.TotalAmt)
+	assert.Equal(t, json.Number("1005"), result.Estimates[0].Entity.TotalAmt)
 	assert.Nil(t, result.Estimates[1].Deleted)
 	assert.NotNil(t, result.Estimates[1].Entity)
 	assert.Equal(t, "46", result.Estimates[1].Entity.ID)

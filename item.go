@@ -6,43 +6,63 @@ import (
 	"strconv"
 )
 
-// Item represents a QuickBooks Item object (a product type).
+// Item represents a QuickBooks Item object as returned by the API (a product or service).
+// Read-only fields (Id, SyncToken, MetaData, QtyOnHand) are populated by the service.
 type Item struct {
-	ID          string   `json:"Id,omitempty"`
-	SyncToken   string   `json:",omitempty"`
-	MetaData    MetaData `json:",omitempty"`
+	ID          string      `json:"Id,omitempty"`
+	SyncToken   string      `json:",omitempty"`
+	MetaData    *MetaData   `json:",omitempty"`
 	Name        string
-	SKU         string `json:"Sku,omitempty"`
-	Description string `json:",omitempty"`
-	Active      bool   `json:",omitempty"`
-	// SubItem
-	// ParentRef
-	// Level
-	// FullyQualifiedName
-	Taxable             bool        `json:",omitempty"`
-	SalesTaxIncluded    bool        `json:",omitempty"`
-	UnitPrice           json.Number `json:",omitempty"`
+	SKU         *string     `json:"Sku,omitempty"`
+	Description *string     `json:",omitempty"`
+	Active      *bool       `json:",omitempty"`
+	Taxable     *bool       `json:",omitempty"`
+	SalesTaxIncluded    *bool          `json:",omitempty"`
+	UnitPrice           json.Number    `json:",omitempty"`
 	Type                string
-	IncomeAccountRef    ReferenceType
-	ExpenseAccountRef   ReferenceType
-	PurchaseDesc        string      `json:",omitempty"`
-	PurchaseTaxIncluded bool        `json:",omitempty"`
-	PurchaseCost        json.Number `json:",omitempty"`
-	AssetAccountRef     ReferenceType
-	TrackQtyOnHand      bool `json:",omitempty"`
-	// InvStartDate Date
-	QtyOnHand          json.Number   `json:",omitempty"`
-	SalesTaxCodeRef    ReferenceType `json:",omitempty"`
-	PurchaseTaxCodeRef ReferenceType `json:",omitempty"`
+	IncomeAccountRef    *ReferenceType `json:",omitempty"`
+	ExpenseAccountRef   *ReferenceType `json:",omitempty"`
+	PurchaseDesc        *string        `json:",omitempty"`
+	PurchaseTaxIncluded *bool          `json:",omitempty"`
+	PurchaseCost        json.Number    `json:",omitempty"`
+	AssetAccountRef     *ReferenceType `json:",omitempty"`
+	TrackQtyOnHand      *bool          `json:",omitempty"`
+	QtyOnHand           json.Number    `json:",omitempty"`
+	SalesTaxCodeRef     *ReferenceType `json:",omitempty"`
+	PurchaseTaxCodeRef  *ReferenceType `json:",omitempty"`
 }
 
-func (c *Client) CreateItem(item *Item) (*Item, error) {
+// ItemCreateInput contains the writable fields accepted when creating an Item.
+// Name and Type are required; account refs are conditionally required based on Type.
+type ItemCreateInput struct {
+	Name                string         `json:",omitempty"`
+	Type                string         `json:",omitempty"`
+	SKU                 *string        `json:"Sku,omitempty"`
+	Description         *string        `json:",omitempty"`
+	Active              *bool          `json:",omitempty"`
+	Taxable             *bool          `json:",omitempty"`
+	SalesTaxIncluded    *bool          `json:",omitempty"`
+	UnitPrice           json.Number    `json:",omitempty"`
+	IncomeAccountRef    *ReferenceType `json:",omitempty"`
+	ExpenseAccountRef   *ReferenceType `json:",omitempty"`
+	PurchaseDesc        *string        `json:",omitempty"`
+	PurchaseTaxIncluded *bool          `json:",omitempty"`
+	PurchaseCost        json.Number    `json:",omitempty"`
+	AssetAccountRef     *ReferenceType `json:",omitempty"`
+	TrackQtyOnHand      *bool          `json:",omitempty"`
+	SalesTaxCodeRef     *ReferenceType `json:",omitempty"`
+	PurchaseTaxCodeRef  *ReferenceType `json:",omitempty"`
+}
+
+// CreateItem creates the given Item on the QuickBooks server, returning
+// the resulting Item object.
+func (c *Client) CreateItem(input *ItemCreateInput) (*Item, error) {
 	var resp struct {
 		Item Item
 		Time Date
 	}
 
-	if err := c.post("item", item, &resp, nil); err != nil {
+	if err := c.post("item", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
@@ -87,8 +107,8 @@ func (c *Client) FindItems() ([]Item, error) {
 	return items, nil
 }
 
-// FindItemById returns an item with a given Id.
-func (c *Client) FindItemById(id string) (*Item, error) {
+// FindItemByID returns an item with a given Id.
+func (c *Client) FindItemByID(id string) (*Item, error) {
 	var resp struct {
 		Item Item
 		Time Date
@@ -128,7 +148,7 @@ func (c *Client) UpdateItem(item *Item) (*Item, error) {
 		return nil, errors.New("missing item id")
 	}
 
-	existingItem, err := c.FindItemById(item.ID)
+	existingItem, err := c.FindItemByID(item.ID)
 	if err != nil {
 		return nil, err
 	}
