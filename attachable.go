@@ -89,7 +89,7 @@ func (c *Client) DeleteAttachable(attachable *Attachable) error {
 }
 
 // DownloadAttachable downloads the attachable
-func (c *Client) DownloadAttachable(id string) (string, error) {
+func (c *Client) DownloadAttachable(id string) (s string, e error) {
 	endpointURL := *c.endpoint
 	endpointURL.Path += "download/" + id
 
@@ -107,18 +107,18 @@ func (c *Client) DownloadAttachable(id string) (string, error) {
 		return "", err
 	}
 
-	defer resp.Body.Close()
+	defer func() { e = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return "", parseFailure(resp)
 	}
 
-	downloadUrl, err := io.ReadAll(resp.Body)
+	downloadURL, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
 
-	return string(downloadUrl), err
+	return string(downloadURL), err
 }
 
 // FindAttachables gets the full list of Attachables in the QuickBooks attachable.
@@ -228,7 +228,7 @@ func (c *Client) UpdateAttachable(attachable *Attachable) (*Attachable, error) {
 }
 
 // UploadAttachable uploads the attachable
-func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (*Attachable, error) {
+func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (att *Attachable, e error) {
 	endpointURL := *c.endpoint
 	endpointURL.Path += "upload"
 
@@ -272,7 +272,10 @@ func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (*Atta
 		return nil, err
 	}
 
-	mWriter.Close()
+	err = mWriter.Close()
+	if err != nil {
+		return nil, err
+	}
 
 	req, err := http.NewRequest("POST", endpointURL.String(), &buffer)
 	if err != nil {
@@ -287,7 +290,7 @@ func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (*Atta
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() { e = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, parseFailure(resp)

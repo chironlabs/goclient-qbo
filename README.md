@@ -1,85 +1,31 @@
-# goclient-qbo 
-![Build](https://github.com/rwestlund/quickbooks-go/workflows/Build/badge.svg)
-[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](http://godoc.org/github.com/rwestlund/quickbooks-go)
-[![Go Report Card](https://goreportcard.com/badge/github.com/rwestlund/quickbooks-go)](https://goreportcard.com/report/github.com/rwestlund/quickbooks-go)
+# quickbooks-go (Idiomatic Go Fork)
 
-quickbooks-go is a Go library that provides access to Intuit's QuickBooks
-Online API.
+An idiomatic Go client library for the QuickBooks Online API.
 
-**NOTE:** This library is incomplete. I implemented the minimum for my
-use case. Pull requests welcome :)
+This project is a public fork of the original:
+https://github.com/rwestlund/quickbooks-go
 
-# Example
+It introduces API and structural changes to better align with Go conventions and modern Go practices.
 
-## Authorization flow
+> ⚠️ **This is NOT a drop-in replacement for the original project.**
+> The public API has changed.
 
-Before you can initialize the client, you'll need to obtain an authorization code. You can see an example of this from QuickBooks' [OAuth Playground](https://developer.intuit.com/app/developer/playground).
+---
 
-See [_auth_flow_test.go_](./examples/auth_flow_test.go)
-```go
-clientId     := "<your-client-id>"
-clientSecret := "<your-client-secret>"
-realmId      := "<realm-id>"
+## Why This Fork Exists
 
-qbClient, err := quickbooks.NewClient(clientId, clientSecret, realmId, false, "", nil)
-if err != nil {
-	log.Fatalln(err)
-}
+The original project provides a solid QuickBooks client implementation.  
+This fork was created to:
 
-// To do first when you receive the authorization code from quickbooks callback
-authorizationCode := "<received-from-callback>"
-redirectURI := "https://developer.intuit.com/v2/OAuth2Playground/RedirectUrl"
+- Improve API ergonomics (pointers for optional fields)
+- Align naming and structure with idiomatic Go
+- Modernize dependencies
+- Add more APIs (class, and reports)
 
-bearerToken, err := qbClient.RetrieveBearerToken(authorizationCode, redirectURI)
-if err != nil {
-	log.Fatalln(err)
-}
-// Save the bearer token inside a db
+If you depend on the original API surface, you should continue using the upstream project.
 
-// When the token expire, you can use the following function
-bearerToken, err = qbClient.RefreshToken(bearerToken.RefreshToken)
-if err != nil {
-	log.Fatalln(err)
-}
+---
 
-// Make a request!
-info, err := qbClient.FindCompanyInfo()
-if err != nil {
-	log.Fatalln(err)
-}
+## Installation
 
-fmt.Println(info)
-
-// Revoke the token, this should be done only if a user unsubscribe from your app
-qbClient.RevokeToken(bearerToken.RefreshToken)
-```
-
-## Re-using tokens
-
-See [_reuse_token_test.go_](./examples/reuse_token_test.go)
-```go
-clientId     := "<your-client-id>"
-clientSecret := "<your-client-secret>"
-realmId      := "<realm-id>"
-
-token := quickbooks.BearerToken{
-	RefreshToken:           "<saved-refresh-token>",
-	AccessToken:            "<saved-access-token>",
-}
-
-qbClient, err := quickbooks.NewClient(clientId, clientSecret, realmId, false, "", &token)
-if err != nil {
-	log.Fatalln(err)
-}
-
-// Make a request!
-info, err := qbClient.FindCompanyInfo()
-if err != nil {
-	log.Fatalln(err)
-}
-
-fmt.Println(info)
-```
-
-# License
-BSD-2-Clause
+go get github.com/chironlabs/goclient-qbo
