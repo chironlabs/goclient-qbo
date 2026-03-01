@@ -35,19 +35,22 @@ const (
 	XML  ContentType = "text/xml"
 )
 
+// Attachable represents a QuickBooks Attachable object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData, FileAccessUri, ThumbnailFileAccessUri,
+// TempDownloadUri, ThumbnailTempDownloadUri, Size) are populated by the service.
 type Attachable struct {
 	ID                       string          `json:"Id,omitempty"`
 	SyncToken                string          `json:",omitempty"`
-	FileName                 string          `json:",omitempty"`
-	Note                     string          `json:",omitempty"`
-	Category                 string          `json:",omitempty"`
-	ContentType              ContentType     `json:",omitempty"`
-	PlaceName                string          `json:",omitempty"`
+	MetaData                 *MetaData       `json:",omitempty"`
+	FileName                 *string         `json:",omitempty"`
+	Note                     *string         `json:",omitempty"`
+	Category                 *string         `json:",omitempty"`
+	ContentType              *ContentType    `json:",omitempty"`
+	PlaceName                *string         `json:",omitempty"`
 	AttachableRef            []AttachableRef `json:",omitempty"`
-	Long                     string          `json:",omitempty"`
-	Tag                      string          `json:",omitempty"`
-	Lat                      string          `json:",omitempty"`
-	MetaData                 MetaData        `json:",omitempty"`
+	Long                     *string         `json:",omitempty"`
+	Tag                      *string         `json:",omitempty"`
+	Lat                      *string         `json:",omitempty"`
 	FileAccessURI            string          `json:"FileAccessUri,omitempty"`
 	Size                     json.Number     `json:",omitempty"`
 	ThumbnailFileAccessURI   string          `json:"ThumbnailFileAccessUri,omitempty"`
@@ -55,31 +58,45 @@ type Attachable struct {
 	ThumbnailTempDownloadURI string          `json:"ThumbnailTempDownloadUri,omitempty"`
 }
 
+// AttachableRef links an attachment to a QuickBooks entity.
 type AttachableRef struct {
-	IncludeOnSend bool   `json:",omitempty"`
-	LineInfo      string `json:",omitempty"`
-	NoRefOnly     bool   `json:",omitempty"`
-	// CustomField[0..n]
-	Inactive  bool          `json:",omitempty"`
-	EntityRef ReferenceType `json:",omitempty"`
+	EntityRef     *ReferenceType `json:",omitempty"`
+	LineInfo      *string        `json:",omitempty"`
+	IncludeOnSend *bool          `json:",omitempty"`
+	NoRefOnly     *bool          `json:",omitempty"`
+	Inactive      *bool          `json:",omitempty"`
+}
+
+// AttachableCreateInput contains the writable fields accepted when creating an Attachable.
+// At least one of Note or FileName (with ContentType) is required.
+type AttachableCreateInput struct {
+	FileName      *string         `json:",omitempty"`
+	Note          *string         `json:",omitempty"`
+	Category      *string         `json:",omitempty"`
+	ContentType   *ContentType    `json:",omitempty"`
+	PlaceName     *string         `json:",omitempty"`
+	AttachableRef []AttachableRef `json:",omitempty"`
+	Long          *string         `json:",omitempty"`
+	Tag           *string         `json:",omitempty"`
+	Lat           *string         `json:",omitempty"`
 }
 
 // CreateAttachable creates the given Attachable on the QuickBooks server,
 // returning the resulting Attachable object.
-func (c *Client) CreateAttachable(attachable *Attachable) (*Attachable, error) {
+func (c *Client) CreateAttachable(input *AttachableCreateInput) (*Attachable, error) {
 	var resp struct {
 		Attachable Attachable
 		Time       Date
 	}
 
-	if err := c.post("attachable", attachable, &resp, nil); err != nil {
+	if err := c.post("attachable", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
 	return &resp.Attachable, nil
 }
 
-// DeleteAttachable deletes the attachable
+// DeleteAttachable deletes the attachable.
 func (c *Client) DeleteAttachable(attachable *Attachable) error {
 	if attachable.ID == "" || attachable.SyncToken == "" {
 		return errors.New("missing id/sync token")
@@ -88,7 +105,7 @@ func (c *Client) DeleteAttachable(attachable *Attachable) error {
 	return c.post("attachable", attachable, nil, map[string]string{"operation": "delete"})
 }
 
-// DownloadAttachable downloads the attachable
+// DownloadAttachable downloads the attachable and returns its URL.
 func (c *Client) DownloadAttachable(id string) (s string, e error) {
 	endpointURL := *c.endpoint
 	endpointURL.Path += "download/" + id
@@ -121,7 +138,7 @@ func (c *Client) DownloadAttachable(id string) (s string, e error) {
 	return string(downloadURL), err
 }
 
-// FindAttachables gets the full list of Attachables in the QuickBooks attachable.
+// FindAttachables gets the full list of Attachables in the QuickBooks account.
 func (c *Client) FindAttachables() ([]Attachable, error) {
 	var resp struct {
 		QueryResponse struct {
@@ -159,7 +176,7 @@ func (c *Client) FindAttachables() ([]Attachable, error) {
 	return attachables, nil
 }
 
-// FindAttachableByID finds the attachable by the given id
+// FindAttachableByID finds the attachable by the given id.
 func (c *Client) FindAttachableByID(id string) (*Attachable, error) {
 	var resp struct {
 		Attachable Attachable
@@ -173,7 +190,7 @@ func (c *Client) FindAttachableByID(id string) (*Attachable, error) {
 	return &resp.Attachable, nil
 }
 
-// QueryAttachables accepts an SQL query and returns all attachables found using it
+// QueryAttachables accepts an SQL query and returns all attachables found using it.
 func (c *Client) QueryAttachables(query string) ([]Attachable, error) {
 	var resp struct {
 		QueryResponse struct {
@@ -194,7 +211,7 @@ func (c *Client) QueryAttachables(query string) ([]Attachable, error) {
 	return resp.QueryResponse.Attachables, nil
 }
 
-// UpdateAttachable updates the attachable
+// UpdateAttachable updates the attachable.
 func (c *Client) UpdateAttachable(attachable *Attachable) (*Attachable, error) {
 	if attachable.ID == "" {
 		return nil, errors.New("missing attachable id")
@@ -227,8 +244,13 @@ func (c *Client) UpdateAttachable(attachable *Attachable) (*Attachable, error) {
 	return &attachableData.Attachable, err
 }
 
-// UploadAttachable uploads the attachable
-func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (att *Attachable, e error) {
+// UploadAttachable uploads a file and links it to a QuickBooks entity.
+// FileName and ContentType must be set in the input.
+func (c *Client) UploadAttachable(input *AttachableCreateInput, data io.Reader) (att *Attachable, e error) {
+	if input.FileName == nil || input.ContentType == nil {
+		return nil, errors.New("FileName and ContentType are required for upload")
+	}
+
 	endpointURL := *c.endpoint
 	endpointURL.Path += "upload"
 
@@ -249,7 +271,7 @@ func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (att *
 		return nil, err
 	}
 
-	j, err := json.Marshal(attachable)
+	j, err := json.Marshal(input)
 	if err != nil {
 		return nil, err
 	}
@@ -260,8 +282,8 @@ func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (att *
 
 	// Add file content
 	fileHeader := make(textproto.MIMEHeader)
-	fileHeader.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, "file_content_01", attachable.FileName))
-	fileHeader.Set("Content-Type", string(attachable.ContentType))
+	fileHeader.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, "file_content_01", *input.FileName))
+	fileHeader.Set("Content-Type", string(*input.ContentType))
 
 	fileContent, err := mWriter.CreatePart(fileHeader)
 	if err != nil {
@@ -272,8 +294,7 @@ func (c *Client) UploadAttachable(attachable *Attachable, data io.Reader) (att *
 		return nil, err
 	}
 
-	err = mWriter.Close()
-	if err != nil {
+	if err = mWriter.Close(); err != nil {
 		return nil, err
 	}
 

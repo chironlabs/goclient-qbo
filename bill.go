@@ -6,48 +6,72 @@ import (
 	"strconv"
 )
 
+// Bill represents a QuickBooks Bill object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData, TotalAmt, HomeBalance, Balance, RecurDataRef)
+// are populated by the service.
 type Bill struct {
-	ID           string        `json:"Id,omitempty"`
-	VendorRef    ReferenceType `json:",omitempty"`
-	Line         []Line
-	SyncToken    string        `json:",omitempty"`
-	CurrencyRef  ReferenceType `json:",omitempty"`
-	TxnDate      Date          `json:",omitempty"`
-	APAccountRef ReferenceType `json:",omitempty"`
-	SalesTermRef ReferenceType `json:",omitempty"`
-	LinkedTxn    []LinkedTxn   `json:",omitempty"`
-	// GlobalTaxCalculation
-	TotalAmt                json.Number `json:",omitempty"`
-	TransactionLocationType string      `json:",omitempty"`
-	DueDate                 Date        `json:",omitempty"`
-	MetaData                MetaData    `json:",omitempty"`
-	DocNumber               string
-	PrivateNote             string        `json:",omitempty"`
-	TxnTaxDetail            TxnTaxDetail  `json:",omitempty"`
-	ExchangeRate            json.Number   `json:",omitempty"`
-	DepartmentRef           ReferenceType `json:",omitempty"`
-	IncludeInAnnualTPAR     bool          `json:",omitempty"`
-	HomeBalance             json.Number   `json:",omitempty"`
-	RecurDataRef            ReferenceType `json:",omitempty"`
-	Balance                 json.Number   `json:",omitempty"`
+	ID                      string         `json:"Id,omitempty"`
+	SyncToken               string         `json:",omitempty"`
+	MetaData                *MetaData      `json:",omitempty"`
+	VendorRef               ReferenceType  `json:",omitempty"`
+	Line                    []Line
+	TxnDate                 *Date          `json:",omitempty"`
+	DueDate                 *Date          `json:",omitempty"`
+	DocNumber               *string        `json:",omitempty"`
+	PrivateNote             *string        `json:",omitempty"`
+	APAccountRef            *ReferenceType `json:",omitempty"`
+	SalesTermRef            *ReferenceType `json:",omitempty"`
+	CurrencyRef             *ReferenceType `json:",omitempty"`
+	ExchangeRate            json.Number    `json:",omitempty"`
+	DepartmentRef           *ReferenceType `json:",omitempty"`
+	TransactionLocationType *string        `json:",omitempty"`
+	IncludeInAnnualTPAR     *bool          `json:",omitempty"`
+	LinkedTxn               []LinkedTxn    `json:",omitempty"`
+	TxnTaxDetail            *TxnTaxDetail  `json:",omitempty"`
+	// GlobalTaxCalculation: TaxExcluded, TaxInclusive, NotApplicable
+	TotalAmt     json.Number    `json:",omitempty"`
+	HomeBalance  json.Number    `json:",omitempty"`
+	Balance      json.Number    `json:",omitempty"`
+	RecurDataRef *ReferenceType `json:",omitempty"`
+}
+
+// BillCreateInput contains the writable fields accepted when creating a Bill.
+// VendorRef and Line are required; all other fields are optional.
+type BillCreateInput struct {
+	VendorRef               ReferenceType  `json:",omitempty"`
+	Line                    []Line
+	TxnDate                 *Date          `json:",omitempty"`
+	DueDate                 *Date          `json:",omitempty"`
+	DocNumber               *string        `json:",omitempty"`
+	PrivateNote             *string        `json:",omitempty"`
+	APAccountRef            *ReferenceType `json:",omitempty"`
+	SalesTermRef            *ReferenceType `json:",omitempty"`
+	CurrencyRef             *ReferenceType `json:",omitempty"`
+	ExchangeRate            json.Number    `json:",omitempty"`
+	DepartmentRef           *ReferenceType `json:",omitempty"`
+	TransactionLocationType *string        `json:",omitempty"`
+	IncludeInAnnualTPAR     *bool          `json:",omitempty"`
+	LinkedTxn               []LinkedTxn    `json:",omitempty"`
+	TxnTaxDetail            *TxnTaxDetail  `json:",omitempty"`
+	// GlobalTaxCalculation: TaxExcluded, TaxInclusive, NotApplicable
 }
 
 // CreateBill creates the given Bill on the QuickBooks server, returning
 // the resulting Bill object.
-func (c *Client) CreateBill(bill *Bill) (*Bill, error) {
+func (c *Client) CreateBill(input *BillCreateInput) (*Bill, error) {
 	var resp struct {
 		Bill Bill
 		Time Date
 	}
 
-	if err := c.post("bill", bill, &resp, nil); err != nil {
+	if err := c.post("bill", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
 	return &resp.Bill, nil
 }
 
-// DeleteBill deletes the bill
+// DeleteBill deletes the bill.
 func (c *Client) DeleteBill(bill *Bill) error {
 	if bill.ID == "" || bill.SyncToken == "" {
 		return errors.New("missing id/sync token")
@@ -94,7 +118,7 @@ func (c *Client) FindBills() ([]Bill, error) {
 	return bills, nil
 }
 
-// FindBillByID finds the bill by the given id
+// FindBillByID finds the bill by the given id.
 func (c *Client) FindBillByID(id string) (*Bill, error) {
 	var resp struct {
 		Bill Bill
@@ -108,7 +132,7 @@ func (c *Client) FindBillByID(id string) (*Bill, error) {
 	return &resp.Bill, nil
 }
 
-// QueryBills accepts an SQL query and returns all bills found using it
+// QueryBills accepts an SQL query and returns all bills found using it.
 func (c *Client) QueryBills(query string) ([]Bill, error) {
 	var resp struct {
 		QueryResponse struct {
@@ -129,7 +153,7 @@ func (c *Client) QueryBills(query string) ([]Bill, error) {
 	return resp.QueryResponse.Bills, nil
 }
 
-// UpdateBill updates the bill
+// UpdateBill updates the bill.
 func (c *Client) UpdateBill(bill *Bill) (*Bill, error) {
 	if bill.ID == "" {
 		return nil, errors.New("missing bill id")
