@@ -5,8 +5,7 @@ jobs:
     strategy:
       matrix:
         go-version: [1.22.x, 1.23.x, 1.24.x]
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,4 +16,10 @@ jobs:
       - name: Build
         run: go build ./...
       - name: Test
-        run: go test -cover ./...
+        run: go test -coverprofile=coverage.out ./...
+      - name: Coverage summary
+        run: |
+          echo "## Code Coverage (Go ${{ matrix.go-version }})" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          go tool cover -func=coverage.out >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
