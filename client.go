@@ -32,13 +32,13 @@ type Client struct {
 }
 
 // NewClient initializes a new QuickBooks client for interacting with their Online API
-func NewClient(clientId string, clientSecret string, realm string, isProduction bool, minorVersion string, token *BearerToken) (c *Client, err error) {
+func NewClient(clientID string, clientSecret string, realm string, isProduction bool, minorVersion string, token *BearerToken) (c *Client, err error) {
 	if minorVersion == "" {
 		minorVersion = "65"
 	}
 
 	client := Client{
-		clientID:     clientId,
+		clientID:     clientID,
 		clientSecret: clientSecret,
 		minorVersion: minorVersion,
 		realm:        realm,
@@ -79,7 +79,7 @@ func NewClient(clientId string, clientSecret string, realm string, isProduction 
 // Example: qbClient.FindAuthorizationURL("com.intuit.quickbooks.accounting", "security_token", "https://developer.intuit.com/v2/OAuth2Playground/RedirectUrl")
 //
 // You can find live examples from https://developer.intuit.com/app/developer/playground
-func (c *Client) FindAuthorizationURL(scope string, state string, redirectUri string) (string, error) {
+func (c *Client) FindAuthorizationURL(scope string, state string, redirectURI string) (string, error) {
 	var authorizationURL *url.URL
 
 	authorizationURL, err := url.Parse(c.discoveryAPI.AuthorizationEndpoint)
@@ -91,14 +91,14 @@ func (c *Client) FindAuthorizationURL(scope string, state string, redirectUri st
 	urlValues.Add("client_id", c.clientID)
 	urlValues.Add("response_type", "code")
 	urlValues.Add("scope", scope)
-	urlValues.Add("redirect_uri", redirectUri)
+	urlValues.Add("redirect_uri", redirectURI)
 	urlValues.Add("state", state)
 	authorizationURL.RawQuery = urlValues.Encode()
 
 	return authorizationURL.String(), nil
 }
 
-func (c *Client) req(method string, endpoint string, payloadData interface{}, responseObject interface{}, queryParameters map[string]string) (e error) {
+func (c *Client) req(method string, endpoint string, payloadData any, responseObject any, queryParameters map[string]string) (e error) {
 	// TODO: possibly just wait until c.throttled is false, and continue the request?
 	if c.throttled {
 		return errors.New("waiting for rate limit")

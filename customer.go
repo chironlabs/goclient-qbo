@@ -10,44 +10,71 @@ import (
 	"gopkg.in/guregu/null.v4"
 )
 
-// Customer represents a QuickBooks Customer object.
+// Customer represents a QuickBooks Customer object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData, FullyQualifiedName, Level,
+// Balance, OpenBalanceDate, BalanceWithJobs) are populated by the service.
 type Customer struct {
-	ID                 string   `json:"Id,omitempty"`
-	SyncToken          string   `json:",omitempty"`
-	MetaData           MetaData `json:",omitempty"`
-	Title              string   `json:",omitempty"`
-	GivenName          string   `json:",omitempty"`
-	MiddleName         string   `json:",omitempty"`
-	FamilyName         string   `json:",omitempty"`
-	Suffix             string   `json:",omitempty"`
-	DisplayName        string   `json:",omitempty"`
-	FullyQualifiedName string   `json:",omitempty"`
-	CompanyName        string   `json:",omitempty"`
-	PrintOnCheckName   string   `json:",omitempty"`
-	Active             bool
-	PrimaryPhone       TelephoneNumber `json:",omitempty"`
-	AlternatePhone     TelephoneNumber `json:",omitempty"`
-	Mobile             TelephoneNumber `json:",omitempty"`
-	Fax                TelephoneNumber `json:",omitempty"`
-	CustomerTypeRef    ReferenceType   `json:",omitempty"`
+	ID                 string          `json:"Id,omitempty"`
+	SyncToken          string          `json:",omitempty"`
+	MetaData           *MetaData       `json:",omitempty"`
+	Title              string          `json:",omitempty"`
+	GivenName          string          `json:",omitempty"`
+	MiddleName         *string         `json:",omitempty"`
+	FamilyName         string          `json:",omitempty"`
+	Suffix             *string         `json:",omitempty"`
+	DisplayName        string          `json:",omitempty"`
+	FullyQualifiedName string          `json:",omitempty"`
+	CompanyName        string          `json:",omitempty"`
+	PrintOnCheckName   *string         `json:",omitempty"`
+	Active             *bool           `json:",omitempty"`
+	PrimaryPhone       *TelephoneNumber `json:",omitempty"`
+	AlternatePhone     *TelephoneNumber `json:",omitempty"`
+	Mobile             *TelephoneNumber `json:",omitempty"`
+	Fax                *TelephoneNumber `json:",omitempty"`
+	CustomerTypeRef    *ReferenceType  `json:",omitempty"`
 	PrimaryEmailAddr   *EmailAddress   `json:",omitempty"`
 	WebAddr            *WebSiteAddress `json:",omitempty"`
-	// DefaultTaxCodeRef
-	Taxable              *bool         `json:",omitempty"`
+	Taxable            *bool           `json:",omitempty"`
 	TaxExemptionReasonID *string       `json:"TaxExemptionReasonId,omitempty"`
-	BillAddr             *Address      `json:",omitempty"`
-	ShipAddr             *Address      `json:",omitempty"`
-	Notes                string        `json:",omitempty"`
-	Job                  null.Bool     `json:",omitempty"`
-	BillWithParent       bool          `json:",omitempty"`
-	ParentRef            ReferenceType `json:",omitempty"`
-	Level                int           `json:",omitempty"`
-	// SalesTermRef
-	// PaymentMethodRef
-	Balance         json.Number `json:",omitempty"`
-	OpenBalanceDate Date        `json:",omitempty"`
-	BalanceWithJobs json.Number `json:",omitempty"`
-	// CurrencyRef
+	BillAddr           *Address        `json:",omitempty"`
+	ShipAddr           *Address        `json:",omitempty"`
+	Notes              *string         `json:",omitempty"`
+	Job                null.Bool       `json:",omitempty"`
+	BillWithParent     *bool           `json:",omitempty"`
+	ParentRef          *ReferenceType  `json:",omitempty"`
+	Level              int             `json:",omitempty"`
+	Balance            json.Number     `json:",omitempty"`
+	OpenBalanceDate    Date            `json:",omitempty"`
+	BalanceWithJobs    json.Number     `json:",omitempty"`
+}
+
+// CustomerCreateInput contains the writable fields accepted when creating a Customer.
+// At least one of GivenName, FamilyName, DisplayName, or CompanyName is required.
+type CustomerCreateInput struct {
+	GivenName          string           `json:",omitempty"`
+	FamilyName         string           `json:",omitempty"`
+	DisplayName        string           `json:",omitempty"`
+	CompanyName        string           `json:",omitempty"`
+	Title              string           `json:",omitempty"`
+	MiddleName         *string          `json:",omitempty"`
+	Suffix             *string          `json:",omitempty"`
+	PrintOnCheckName   *string          `json:",omitempty"`
+	Active             *bool            `json:",omitempty"`
+	PrimaryPhone       *TelephoneNumber `json:",omitempty"`
+	AlternatePhone     *TelephoneNumber `json:",omitempty"`
+	Mobile             *TelephoneNumber `json:",omitempty"`
+	Fax                *TelephoneNumber `json:",omitempty"`
+	CustomerTypeRef    *ReferenceType   `json:",omitempty"`
+	PrimaryEmailAddr   *EmailAddress    `json:",omitempty"`
+	WebAddr            *WebSiteAddress  `json:",omitempty"`
+	Taxable            *bool            `json:",omitempty"`
+	TaxExemptionReasonID *string        `json:"TaxExemptionReasonId,omitempty"`
+	BillAddr           *Address         `json:",omitempty"`
+	ShipAddr           *Address         `json:",omitempty"`
+	Notes              *string          `json:",omitempty"`
+	Job                null.Bool        `json:",omitempty"`
+	BillWithParent     *bool            `json:",omitempty"`
+	ParentRef          *ReferenceType   `json:",omitempty"`
 }
 
 // GetAddress prioritizes the ship address, but falls back on bill address
@@ -79,13 +106,13 @@ func (c *Customer) GetPrimaryEmail() string {
 
 // CreateCustomer creates the given Customer on the QuickBooks server,
 // returning the resulting Customer object.
-func (c *Client) CreateCustomer(customer *Customer) (*Customer, error) {
+func (c *Client) CreateCustomer(input *CustomerCreateInput) (*Customer, error) {
 	var resp struct {
 		Customer Customer
 		Time     Date
 	}
 
-	if err := c.post("customer", customer, &resp, nil); err != nil {
+	if err := c.post("customer", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
@@ -130,8 +157,8 @@ func (c *Client) FindCustomers() ([]Customer, error) {
 	return customers, nil
 }
 
-// FindCustomerById returns a customer with a given Id.
-func (c *Client) FindCustomerById(id string) (*Customer, error) {
+// FindCustomerByID returns a customer with a given Id.
+func (c *Client) FindCustomerByID(id string) (*Customer, error) {
 	var r struct {
 		Customer Customer
 		Time     Date
@@ -187,6 +214,15 @@ func (c *Client) QueryCustomers(query string) ([]Customer, error) {
 	return resp.QueryResponse.Customers, nil
 }
 
+// DeleteCustomer deletes the customer.
+func (c *Client) DeleteCustomer(customer *Customer) error {
+	if customer.ID == "" || customer.SyncToken == "" {
+		return errors.New("missing id/sync token")
+	}
+
+	return c.post("customer", customer, nil, map[string]string{"operation": "delete"})
+}
+
 // UpdateCustomer updates the given Customer on the QuickBooks server,
 // returning the resulting Customer object. It's a sparse update, as not all QB
 // fields are present in our Customer object.
@@ -195,7 +231,7 @@ func (c *Client) UpdateCustomer(customer *Customer) (*Customer, error) {
 		return nil, errors.New("missing customer id")
 	}
 
-	existingCustomer, err := c.FindCustomerById(customer.ID)
+	existingCustomer, err := c.FindCustomerByID(customer.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find existing customer: %v", err)
 	}

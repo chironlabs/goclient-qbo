@@ -6,37 +6,57 @@ import (
 	"strconv"
 )
 
+// CreditMemo represents a QuickBooks CreditMemo object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData, TotalAmt, RemainingCredit, Balance)
+// are populated by the service.
 type CreditMemo struct {
-	TotalAmt              float64       `json:",omitempty"`
-	RemainingCredit       json.Number   `json:",omitempty"`
-	Line                  []Line        `json:",omitempty"`
-	ApplyTaxAfterDiscount bool          `json:",omitempty"`
-	DocNumber             string        `json:",omitempty"`
-	TxnDate               Date          `json:",omitempty"`
-	Sparse                bool          `json:"sparse,omitempty"`
-	CustomerMemo          MemoRef       `json:",omitempty"`
-	ProjectRef            ReferenceType `json:",omitempty"`
-	Balance               json.Number   `json:",omitempty"`
-	CustomerRef           ReferenceType `json:",omitempty"`
-	TxnTaxDetail          *TxnTaxDetail `json:",omitempty"`
-	SyncToken             string        `json:",omitempty"`
-	CustomField           []CustomField `json:",omitempty"`
-	ShipAddr              Address       `json:",omitempty"`
-	EmailStatus           string        `json:",omitempty"`
-	BillAddr              Address       `json:",omitempty"`
-	MetaData              MetaData      `json:",omitempty"`
-	BillEmail             EmailAddress  `json:",omitempty"`
-	ID                    string        `json:Id",omitempty"`
+	ID           string        `json:"Id,omitempty"`
+	SyncToken    string        `json:",omitempty"`
+	MetaData     *MetaData     `json:",omitempty"`
+	DocNumber    *string       `json:",omitempty"`
+	TxnDate      *Date         `json:",omitempty"`
+	CustomerRef  ReferenceType `json:",omitempty"`
+	CustomerMemo *MemoRef      `json:",omitempty"`
+	ProjectRef   *ReferenceType `json:",omitempty"`
+	BillAddr     *Address      `json:",omitempty"`
+	ShipAddr     *Address      `json:",omitempty"`
+	EmailStatus  *string       `json:",omitempty"`
+	BillEmail    *EmailAddress `json:",omitempty"`
+	Line         []Line        `json:",omitempty"`
+	TxnTaxDetail *TxnTaxDetail `json:",omitempty"`
+	ApplyTaxAfterDiscount *bool `json:",omitempty"`
+	CustomField  []CustomField `json:",omitempty"`
+	TotalAmt     json.Number   `json:",omitempty"`
+	RemainingCredit json.Number `json:",omitempty"`
+	Balance      json.Number   `json:",omitempty"`
 }
 
-// CreateCreditMemo creates the given CreditMemo witin QuickBooks.
-func (c *Client) CreateCreditMemo(creditMemo *CreditMemo) (*CreditMemo, error) {
+// CreditMemoCreateInput contains the writable fields accepted when creating a CreditMemo.
+// CustomerRef and Line are required; all other fields are optional.
+type CreditMemoCreateInput struct {
+	CustomerRef  ReferenceType  `json:",omitempty"`
+	Line         []Line
+	DocNumber    *string        `json:",omitempty"`
+	TxnDate      *Date          `json:",omitempty"`
+	CustomerMemo *MemoRef       `json:",omitempty"`
+	ProjectRef   *ReferenceType `json:",omitempty"`
+	BillAddr     *Address       `json:",omitempty"`
+	ShipAddr     *Address       `json:",omitempty"`
+	EmailStatus  *string        `json:",omitempty"`
+	BillEmail    *EmailAddress  `json:",omitempty"`
+	TxnTaxDetail *TxnTaxDetail  `json:",omitempty"`
+	ApplyTaxAfterDiscount *bool `json:",omitempty"`
+	CustomField  []CustomField  `json:",omitempty"`
+}
+
+// CreateCreditMemo creates the given CreditMemo within QuickBooks.
+func (c *Client) CreateCreditMemo(input *CreditMemoCreateInput) (*CreditMemo, error) {
 	var resp struct {
 		CreditMemo CreditMemo
 		Time       Date
 	}
 
-	if err := c.post("creditmemo", creditMemo, &resp, nil); err != nil {
+	if err := c.post("creditmemo", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
@@ -90,8 +110,8 @@ func (c *Client) FindCreditMemos() ([]CreditMemo, error) {
 	return creditMemos, nil
 }
 
-// FindCreditMemoById retrieves the given credit memo from QuickBooks.
-func (c *Client) FindCreditMemoById(id string) (*CreditMemo, error) {
+// FindCreditMemoByID retrieves the given credit memo from QuickBooks.
+func (c *Client) FindCreditMemoByID(id string) (*CreditMemo, error) {
 	var resp struct {
 		CreditMemo CreditMemo
 		Time       Date
@@ -104,7 +124,7 @@ func (c *Client) FindCreditMemoById(id string) (*CreditMemo, error) {
 	return &resp.CreditMemo, nil
 }
 
-// QueryCreditMemos accepts n SQL query and returns all credit memos found using it.
+// QueryCreditMemos accepts an SQL query and returns all credit memos found using it.
 func (c *Client) QueryCreditMemos(query string) ([]CreditMemo, error) {
 	var resp struct {
 		QueryResponse struct {
@@ -131,7 +151,7 @@ func (c *Client) UpdateCreditMemo(creditMemo *CreditMemo) (*CreditMemo, error) {
 		return nil, errors.New("missing credit memo id")
 	}
 
-	existingCreditMemo, err := c.FindCreditMemoById(creditMemo.ID)
+	existingCreditMemo, err := c.FindCreditMemoByID(creditMemo.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -1,37 +1,51 @@
 package quickbooks
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 )
 
+// Payment represents a QuickBooks Payment object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData, UnappliedAmt) are populated by the service.
 type Payment struct {
-	SyncToken           string        `json:",omitempty"`
-	Domain              string        `json:"domain,omitempty"`
-	DepositToAccountRef ReferenceType `json:",omitempty"`
-	UnappliedAmt        float64       `json:",omitempty"`
-	TxnDate             Date          `json:",omitempty"`
-	TotalAmt            float64       `json:",omitempty"`
-	ProcessPayment      bool          `json:",omitempty"`
-	Line                []PaymentLine `json:",omitempty"`
-	CustomerRef         ReferenceType `json:",omitempty"`
-	ID                  string        `json:",omitempty"`
-	MetaData            MetaData      `json:",omitempty"`
+	ID                  string         `json:"Id,omitempty"`
+	SyncToken           string         `json:",omitempty"`
+	MetaData            *MetaData      `json:",omitempty"`
+	CustomerRef         ReferenceType  `json:",omitempty"`
+	TotalAmt            json.Number    `json:",omitempty"`
+	UnappliedAmt        json.Number    `json:",omitempty"`
+	TxnDate             *Date          `json:",omitempty"`
+	DepositToAccountRef *ReferenceType `json:",omitempty"`
+	ProcessPayment      *bool          `json:",omitempty"`
+	Line                []PaymentLine  `json:",omitempty"`
 }
 
+// PaymentLine represents a line item within a Payment.
 type PaymentLine struct {
-	Amount    float64     `json:",omitempty"`
+	Amount    json.Number `json:",omitempty"`
 	LinkedTxn []LinkedTxn `json:",omitempty"`
 }
 
+// PaymentCreateInput contains the writable fields accepted when creating a Payment.
+// CustomerRef and TotalAmt are required; all other fields are optional.
+type PaymentCreateInput struct {
+	CustomerRef         ReferenceType  `json:",omitempty"`
+	TotalAmt            json.Number    `json:",omitempty"`
+	TxnDate             *Date          `json:",omitempty"`
+	DepositToAccountRef *ReferenceType `json:",omitempty"`
+	ProcessPayment      *bool          `json:",omitempty"`
+	Line                []PaymentLine  `json:",omitempty"`
+}
+
 // CreatePayment creates the given payment within QuickBooks.
-func (c *Client) CreatePayment(payment *Payment) (*Payment, error) {
+func (c *Client) CreatePayment(input *PaymentCreateInput) (*Payment, error) {
 	var resp struct {
 		Payment Payment
 		Time    Date
 	}
 
-	if err := c.post("payment", payment, &resp, nil); err != nil {
+	if err := c.post("payment", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
@@ -85,7 +99,7 @@ func (c *Client) FindPayments() ([]Payment, error) {
 	return payments, nil
 }
 
-// FindPaymentByID returns an payment with a given Id.
+// FindPaymentByID returns a payment with a given Id.
 func (c *Client) FindPaymentByID(id string) (*Payment, error) {
 	var resp struct {
 		Payment Payment
@@ -154,7 +168,7 @@ func (c *Client) UpdatePayment(payment *Payment) (*Payment, error) {
 }
 
 // VoidPayment voids the given payment in QuickBooks.
-func (c *Client) VoidPayment(payment Payment) error {
+func (c *Client) VoidPayment(payment *Payment) error {
 	if payment.ID == "" {
 		return errors.New("missing payment id")
 	}

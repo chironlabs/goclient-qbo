@@ -18,7 +18,7 @@ type CompanyInfo struct {
 	Email                     *EmailAddress    `json:",omitempty"`
 	WebAddr                   *WebSiteAddress  `json:",omitempty"`
 	NameValue                 []NameValue      `json:",omitempty"`
-	Metadata                  MetaData
+	MetaData                  *MetaData `json:",omitempty"`
 }
 
 // FindCompanyInfo returns the QuickBooks CompanyInfo object. This is a good

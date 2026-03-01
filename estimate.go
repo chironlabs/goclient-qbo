@@ -1,41 +1,62 @@
 package quickbooks
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 )
 
+// Estimate represents a QuickBooks Estimate object as returned by the API.
+// Read-only fields (Id, SyncToken, MetaData, TotalAmt) are populated by the service.
 type Estimate struct {
-	DocNumber             string        `json:",omitempty"`
-	SyncToken             string        `json:",omitempty"`
-	Domain                string        `json:"domain,omitempty"`
-	TxnStatus             string        `json:",omitempty"`
-	BillEmail             EmailAddress  `json:",omitempty"`
-	TxnDate               Date          `json:",omitempty"`
-	TotalAmt              float64       `json:",omitempty"`
-	CustomerRef           ReferenceType `json:",omitempty"`
-	CustomerMemo          MemoRef       `json:",omitempty"`
-	ShipAddr              Address       `json:",omitempty"`
-	PrintStatus           string        `json:",omitempty"`
-	BillAddr              Address       `json:",omitempty"`
-	EmailStatus           string        `json:",omitempty"`
-	Line                  []Line        `json:",omitempty"`
-	ApplyTaxAfterDiscount bool          `json:",omitempty"`
-	CustomField           []CustomField `json:",omitempty"`
-	ID                    string        `json:"Id,omitempty"`
-	TxnTaxDetail          TxnTaxDetail  `json:",omitempty"`
-	MetaData              MetaData      `json:",omitempty"`
+	ID           string        `json:"Id,omitempty"`
+	SyncToken    string        `json:",omitempty"`
+	MetaData     *MetaData     `json:",omitempty"`
+	DocNumber    *string       `json:",omitempty"`
+	TxnDate      *Date         `json:",omitempty"`
+	TxnStatus    *string       `json:",omitempty"`
+	CustomerRef  ReferenceType `json:",omitempty"`
+	CustomerMemo *MemoRef      `json:",omitempty"`
+	BillAddr     *Address      `json:",omitempty"`
+	ShipAddr     *Address      `json:",omitempty"`
+	PrintStatus  *string       `json:",omitempty"`
+	EmailStatus  *string       `json:",omitempty"`
+	BillEmail    *EmailAddress `json:",omitempty"`
+	Line         []Line        `json:",omitempty"`
+	TxnTaxDetail *TxnTaxDetail `json:",omitempty"`
+	ApplyTaxAfterDiscount *bool `json:",omitempty"`
+	CustomField  []CustomField `json:",omitempty"`
+	TotalAmt     json.Number   `json:",omitempty"`
+}
+
+// EstimateCreateInput contains the writable fields accepted when creating an Estimate.
+// CustomerRef and Line are required; all other fields are optional.
+type EstimateCreateInput struct {
+	CustomerRef  ReferenceType  `json:",omitempty"`
+	Line         []Line
+	DocNumber    *string        `json:",omitempty"`
+	TxnDate      *Date          `json:",omitempty"`
+	TxnStatus    *string        `json:",omitempty"`
+	CustomerMemo *MemoRef       `json:",omitempty"`
+	BillAddr     *Address       `json:",omitempty"`
+	ShipAddr     *Address       `json:",omitempty"`
+	PrintStatus  *string        `json:",omitempty"`
+	EmailStatus  *string        `json:",omitempty"`
+	BillEmail    *EmailAddress  `json:",omitempty"`
+	TxnTaxDetail *TxnTaxDetail  `json:",omitempty"`
+	ApplyTaxAfterDiscount *bool `json:",omitempty"`
+	CustomField  []CustomField  `json:",omitempty"`
 }
 
 // CreateEstimate creates the given Estimate on the QuickBooks server, returning
 // the resulting Estimate object.
-func (c *Client) CreateEstimate(estimate *Estimate) (*Estimate, error) {
+func (c *Client) CreateEstimate(input *EstimateCreateInput) (*Estimate, error) {
 	var resp struct {
 		Estimate Estimate
 		Time     Date
 	}
 
-	if err := c.post("estimate", estimate, &resp, nil); err != nil {
+	if err := c.post("estimate", input, &resp, nil); err != nil {
 		return nil, err
 	}
 
@@ -89,8 +110,8 @@ func (c *Client) FindEstimates() ([]Estimate, error) {
 	return estimates, nil
 }
 
-// FindEstimateById finds the estimate by the given id
-func (c *Client) FindEstimateById(id string) (*Estimate, error) {
+// FindEstimateByID finds the estimate by the given id
+func (c *Client) FindEstimateByID(id string) (*Estimate, error) {
 	var resp struct {
 		Estimate Estimate
 		Time     Date
@@ -141,7 +162,7 @@ func (c *Client) UpdateEstimate(estimate *Estimate) (*Estimate, error) {
 		return nil, errors.New("missing estimate id")
 	}
 
-	existingEstimate, err := c.FindEstimateById(estimate.ID)
+	existingEstimate, err := c.FindEstimateByID(estimate.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -168,12 +189,12 @@ func (c *Client) UpdateEstimate(estimate *Estimate) (*Estimate, error) {
 	return &estimateData.Estimate, err
 }
 
-func (c *Client) VoidEstimate(estimate Estimate) error {
+func (c *Client) VoidEstimate(estimate *Estimate) error {
 	if estimate.ID == "" {
 		return errors.New("missing estimate id")
 	}
 
-	existingEstimate, err := c.FindEstimateById(estimate.ID)
+	existingEstimate, err := c.FindEstimateByID(estimate.ID)
 	if err != nil {
 		return err
 	}
