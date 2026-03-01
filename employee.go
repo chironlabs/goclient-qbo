@@ -6,19 +6,23 @@ import (
 )
 
 type Employee struct {
-	SyncToken        string          `json:",omitempty"`
-	Domain           string          `json:"domain,omitempty"`
-	DisplayName      string          `json:",omitempty"`
-	PrimaryPhone     TelephoneNumber `json:",omitempty"`
-	PrintOnCheckName string          `json:",omitempty"`
-	FamilyName       string          `json:",omitempty"`
+	SyncToken        string `json:",omitempty"`
+	Domain           string `json:"domain,omitempty"`
+	DisplayName      string `json:",omitempty"`
+	PrintOnCheckName string `json:",omitempty"`
+	FamilyName       string `json:",omitempty"`
 	Active           bool
-	SSN              string   `json:",omitempty"`
-	PrimaryAddr      Address  `json:",omitempty"`
-	BillableTime     bool     `json:",omitempty"`
-	GivenName        string   `json:",omitempty"`
-	ID               string   `json:"Id,omitempty"`
-	MetaData         MetaData `json:",omitempty"`
+
+	//	ignoring these fields on purpose, if you want to sync in PII for whatever reason
+	//	you can fork this PR and unmarshal it, but you probably shouldn't
+	SSN          *string         `json:"-"`
+	PrimaryAddr  *Address        `json:"-"`
+	PrimaryPhone TelephoneNumber `json:"-"`
+
+	BillableTime bool     `json:",omitempty"`
+	GivenName    string   `json:",omitempty"`
+	ID           string   `json:"Id,omitempty"`
+	MetaData     MetaData `json:",omitempty"`
 }
 
 // CreateEmployee creates the given employee within QuickBooks

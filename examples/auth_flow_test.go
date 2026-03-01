@@ -9,11 +9,11 @@ import (
 )
 
 func TestAuthorizationFlow(t *testing.T) {
-	clientId := "<your-client-id>"
+	clientID := "<your-client-id>"
 	clientSecret := "<your-client-secret>"
-	realmId := "<realm-id>"
+	realm := "<realm-id>"
 
-	qbClient, err := quickbooks.NewClient(clientId, clientSecret, realmId, false, "", nil)
+	qbClient, err := quickbooks.NewClient(clientID, clientSecret, realm, false, "", nil)
 	require.NoError(t, err)
 
 	// To do first when you receive the authorization code from quickbooks callback

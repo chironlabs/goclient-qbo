@@ -9,16 +9,16 @@ import (
 )
 
 func TestReuseToken(t *testing.T) {
-	clientId := "<your-client-id>"
+	clientID := "<your-client-id>"
 	clientSecret := "<your-client-secret>"
-	realmId := "<realm-id>"
+	realm := "<realm-id>"
 
 	token := quickbooks.BearerToken{
 		RefreshToken: "<saved-refresh-token>",
 		AccessToken:  "<saved-access-token>",
 	}
 
-	qbClient, err := quickbooks.NewClient(clientId, clientSecret, realmId, false, "", &token)
+	qbClient, err := quickbooks.NewClient(clientID, clientSecret, realm, false, "", &token)
 	require.NoError(t, err)
 
 	// Make a request!
