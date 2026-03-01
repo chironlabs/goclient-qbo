@@ -1,4 +1,4 @@
-module github.com/rwestlund/quickbooks-go
+module github.com/chironlabs/goclient-qbo
 
 go 1.20
 
