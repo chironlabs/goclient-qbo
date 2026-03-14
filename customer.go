@@ -214,6 +214,44 @@ func (c *Client) QueryCustomers(query string) ([]Customer, error) {
 	return resp.QueryResponse.Customers, nil
 }
 
+// ListCustomers returns one page of Customers ordered by Id.
+// Pass an empty pageToken to start from the beginning.
+// The returned nextPageToken is empty when there are no more results.
+func (c *Client) ListCustomers(pageToken string, pageSize int) (*ListResponse[Customer], error) {
+	if pageSize <= 0 || pageSize > queryPageSize {
+		pageSize = queryPageSize
+	}
+
+	startPosition := 1
+	if pageToken != "" {
+		var err error
+		startPosition, err = strconv.Atoi(pageToken)
+		if err != nil {
+			return nil, fmt.Errorf("invalid page token: %v", err)
+		}
+	}
+
+	var resp struct {
+		QueryResponse struct {
+			Customers     []Customer `json:"Customer"`
+			StartPosition int
+			MaxResults    int
+		}
+	}
+
+	query := "SELECT * FROM Customer ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
+	if err := c.query(query, &resp); err != nil {
+		return nil, err
+	}
+
+	result := &ListResponse[Customer]{Items: resp.QueryResponse.Customers}
+	if len(result.Items) == pageSize {
+		result.NextPageToken = strconv.Itoa(startPosition + pageSize)
+	}
+
+	return result, nil
+}
+
 // DeleteCustomer deletes the customer.
 func (c *Client) DeleteCustomer(customer *Customer) error {
 	if customer.ID == "" || customer.SyncToken == "" {

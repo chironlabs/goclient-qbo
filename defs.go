@@ -55,6 +55,13 @@ const (
 	secondFormat  = "2006-01-02"
 )
 
+// ListResponse is returned by paginated List methods.
+// NextPageToken is empty when there are no more results.
+type ListResponse[T any] struct {
+	Items         []T
+	NextPageToken string
+}
+
 func (u EndpointURL) String() string {
 	return string(u)
 }

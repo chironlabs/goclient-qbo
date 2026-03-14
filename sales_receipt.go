@@ -3,6 +3,7 @@ package quickbooks
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -168,6 +169,44 @@ func (c *Client) QuerySalesReceipts(query string) ([]SalesReceipt, error) {
 	}
 
 	return resp.QueryResponse.SalesReceipts, nil
+}
+
+// ListSalesReceipts returns one page of SalesReceipts ordered by Id.
+// Pass an empty pageToken to start from the beginning.
+// The returned nextPageToken is empty when there are no more results.
+func (c *Client) ListSalesReceipts(pageToken string, pageSize int) (*ListResponse[SalesReceipt], error) {
+	if pageSize <= 0 || pageSize > queryPageSize {
+		pageSize = queryPageSize
+	}
+
+	startPosition := 1
+	if pageToken != "" {
+		var err error
+		startPosition, err = strconv.Atoi(pageToken)
+		if err != nil {
+			return nil, fmt.Errorf("invalid page token: %v", err)
+		}
+	}
+
+	var resp struct {
+		QueryResponse struct {
+			SalesReceipts []SalesReceipt `json:"SalesReceipt"`
+			StartPosition int
+			MaxResults    int
+		}
+	}
+
+	query := "SELECT * FROM SalesReceipt ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
+	if err := c.query(query, &resp); err != nil {
+		return nil, err
+	}
+
+	result := &ListResponse[SalesReceipt]{Items: resp.QueryResponse.SalesReceipts}
+	if len(result.Items) == pageSize {
+		result.NextPageToken = strconv.Itoa(startPosition + pageSize)
+	}
+
+	return result, nil
 }
 
 // SendSalesReceipt sends the sales receipt to the SalesReceipt.BillEmail if emailAddress is left empty.

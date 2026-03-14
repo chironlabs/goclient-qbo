@@ -3,6 +3,7 @@ package quickbooks
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -132,6 +133,44 @@ func (c *Client) QueryPayments(query string) ([]Payment, error) {
 	}
 
 	return resp.QueryResponse.Payments, nil
+}
+
+// ListPayments returns one page of Payments ordered by Id.
+// Pass an empty pageToken to start from the beginning.
+// The returned nextPageToken is empty when there are no more results.
+func (c *Client) ListPayments(pageToken string, pageSize int) (*ListResponse[Payment], error) {
+	if pageSize <= 0 || pageSize > queryPageSize {
+		pageSize = queryPageSize
+	}
+
+	startPosition := 1
+	if pageToken != "" {
+		var err error
+		startPosition, err = strconv.Atoi(pageToken)
+		if err != nil {
+			return nil, fmt.Errorf("invalid page token: %v", err)
+		}
+	}
+
+	var resp struct {
+		QueryResponse struct {
+			Payments      []Payment `json:"Payment"`
+			StartPosition int
+			MaxResults    int
+		}
+	}
+
+	query := "SELECT * FROM Payment ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
+	if err := c.query(query, &resp); err != nil {
+		return nil, err
+	}
+
+	result := &ListResponse[Payment]{Items: resp.QueryResponse.Payments}
+	if len(result.Items) == pageSize {
+		result.NextPageToken = strconv.Itoa(startPosition + pageSize)
+	}
+
+	return result, nil
 }
 
 // UpdatePayment updates the given payment in QuickBooks.

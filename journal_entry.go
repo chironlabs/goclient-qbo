@@ -3,6 +3,7 @@ package quickbooks
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -132,6 +133,44 @@ func (c *Client) QueryJournalEntries(query string) ([]JournalEntry, error) {
 	}
 
 	return resp.QueryResponse.JournalEntries, nil
+}
+
+// ListJournalEntries returns one page of JournalEntries ordered by Id.
+// Pass an empty pageToken to start from the beginning.
+// The returned nextPageToken is empty when there are no more results.
+func (c *Client) ListJournalEntries(pageToken string, pageSize int) (*ListResponse[JournalEntry], error) {
+	if pageSize <= 0 || pageSize > queryPageSize {
+		pageSize = queryPageSize
+	}
+
+	startPosition := 1
+	if pageToken != "" {
+		var err error
+		startPosition, err = strconv.Atoi(pageToken)
+		if err != nil {
+			return nil, fmt.Errorf("invalid page token: %v", err)
+		}
+	}
+
+	var resp struct {
+		QueryResponse struct {
+			JournalEntries []JournalEntry `json:"JournalEntry"`
+			StartPosition  int
+			MaxResults     int
+		}
+	}
+
+	query := "SELECT * FROM JournalEntry ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
+	if err := c.query(query, &resp); err != nil {
+		return nil, err
+	}
+
+	result := &ListResponse[JournalEntry]{Items: resp.QueryResponse.JournalEntries}
+	if len(result.Items) == pageSize {
+		result.NextPageToken = strconv.Itoa(startPosition + pageSize)
+	}
+
+	return result, nil
 }
 
 // UpdateJournalEntry updates the journal entry.

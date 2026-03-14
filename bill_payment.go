@@ -3,6 +3,7 @@ package quickbooks
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -151,6 +152,44 @@ func (c *Client) QueryBillPayments(query string) ([]BillPayment, error) {
 	}
 
 	return resp.QueryResponse.BillPayments, nil
+}
+
+// ListBillPayments returns one page of BillPayments ordered by Id.
+// Pass an empty pageToken to start from the beginning.
+// The returned nextPageToken is empty when there are no more results.
+func (c *Client) ListBillPayments(pageToken string, pageSize int) (*ListResponse[BillPayment], error) {
+	if pageSize <= 0 || pageSize > queryPageSize {
+		pageSize = queryPageSize
+	}
+
+	startPosition := 1
+	if pageToken != "" {
+		var err error
+		startPosition, err = strconv.Atoi(pageToken)
+		if err != nil {
+			return nil, fmt.Errorf("invalid page token: %v", err)
+		}
+	}
+
+	var resp struct {
+		QueryResponse struct {
+			BillPayments  []BillPayment `json:"BillPayment"`
+			StartPosition int
+			MaxResults    int
+		}
+	}
+
+	query := "SELECT * FROM BillPayment ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
+	if err := c.query(query, &resp); err != nil {
+		return nil, err
+	}
+
+	result := &ListResponse[BillPayment]{Items: resp.QueryResponse.BillPayments}
+	if len(result.Items) == pageSize {
+		result.NextPageToken = strconv.Itoa(startPosition + pageSize)
+	}
+
+	return result, nil
 }
 
 // UpdateBillPayment updates the bill payment.
