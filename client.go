@@ -142,7 +142,9 @@ func (c *Client) req(method string, endpoint string, payloadData any, responseOb
 	}
 
 	defer func() {
-		e = resp.Body.Close()
+		if closeErr := resp.Body.Close(); closeErr != nil && e == nil {
+			e = closeErr
+		}
 	}()
 
 	switch resp.StatusCode {
