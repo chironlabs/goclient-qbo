@@ -214,7 +214,7 @@ func (c *Client) QueryCustomers(query string) ([]Customer, error) {
 	return resp.QueryResponse.Customers, nil
 }
 
-// ListCustomers returns one page of Customers ordered by Id.
+// ListCustomers returns one page of Customers (active and inactive) ordered by Id.
 // Pass an empty pageToken to start from the beginning.
 // The returned nextPageToken is empty when there are no more results.
 func (c *Client) ListCustomers(pageToken string, pageSize int) (*ListResponse[Customer], error) {
@@ -239,7 +239,7 @@ func (c *Client) ListCustomers(pageToken string, pageSize int) (*ListResponse[Cu
 		}
 	}
 
-	query := "SELECT * FROM Customer ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
+	query := "SELECT * FROM Customer WHERE Active IN (true, false) ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
 	if err := c.query(query, &resp); err != nil {
 		return nil, err
 	}

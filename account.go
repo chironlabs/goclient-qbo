@@ -158,7 +158,7 @@ func (c *Client) QueryAccounts(query string) ([]Account, error) {
 	return resp.QueryResponse.Accounts, nil
 }
 
-// ListAccounts returns one page of Accounts ordered by Id.
+// ListAccounts returns one page of Accounts (active and inactive) ordered by Id.
 // Pass an empty pageToken to start from the beginning.
 // The returned nextPageToken is empty when there are no more results.
 func (c *Client) ListAccounts(pageToken string, pageSize int) (*ListResponse[Account], error) {
@@ -183,7 +183,7 @@ func (c *Client) ListAccounts(pageToken string, pageSize int) (*ListResponse[Acc
 		}
 	}
 
-	query := "SELECT * FROM Account ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
+	query := "SELECT * FROM Account WHERE Active IN (true, false) ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
 	if err := c.query(query, &resp); err != nil {
 		return nil, err
 	}

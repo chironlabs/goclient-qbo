@@ -165,7 +165,7 @@ func (c *Client) QueryVendors(query string) ([]Vendor, error) {
 	return resp.QueryResponse.Vendors, nil
 }
 
-// ListVendors returns one page of Vendors ordered by Id.
+// ListVendors returns one page of Vendors (active and inactive) ordered by Id.
 // Pass an empty pageToken to start from the beginning.
 // The returned nextPageToken is empty when there are no more results.
 func (c *Client) ListVendors(pageToken string, pageSize int) (*ListResponse[Vendor], error) {
@@ -190,7 +190,7 @@ func (c *Client) ListVendors(pageToken string, pageSize int) (*ListResponse[Vend
 		}
 	}
 
-	query := "SELECT * FROM Vendor ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
+	query := "SELECT * FROM Vendor WHERE Active IN (true, false) ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
 	if err := c.query(query, &resp); err != nil {
 		return nil, err
 	}
