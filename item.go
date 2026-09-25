@@ -3,6 +3,7 @@ package quickbooks
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -140,6 +141,44 @@ func (c *Client) QueryItems(query string) ([]Item, error) {
 	}
 
 	return resp.QueryResponse.Items, nil
+}
+
+// ListItems returns one page of Items (active and inactive) ordered by Id.
+// Pass an empty pageToken to start from the beginning.
+// The returned nextPageToken is empty when there are no more results.
+func (c *Client) ListItems(pageToken string, pageSize int) (*ListResponse[Item], error) {
+	if pageSize <= 0 || pageSize > queryPageSize {
+		pageSize = queryPageSize
+	}
+
+	startPosition := 1
+	if pageToken != "" {
+		var err error
+		startPosition, err = strconv.Atoi(pageToken)
+		if err != nil {
+			return nil, fmt.Errorf("invalid page token: %v", err)
+		}
+	}
+
+	var resp struct {
+		QueryResponse struct {
+			Items         []Item `json:"Item"`
+			StartPosition int
+			MaxResults    int
+		}
+	}
+
+	query := "SELECT * FROM Item WHERE Active IN (true, false) ORDERBY Id STARTPOSITION " + strconv.Itoa(startPosition) + " MAXRESULTS " + strconv.Itoa(pageSize)
+	if err := c.query(query, &resp); err != nil {
+		return nil, err
+	}
+
+	result := &ListResponse[Item]{Items: resp.QueryResponse.Items}
+	if len(result.Items) == pageSize {
+		result.NextPageToken = strconv.Itoa(startPosition + pageSize)
+	}
+
+	return result, nil
 }
 
 // DeleteItem deletes the item.

@@ -154,6 +154,23 @@ type Line struct {
 	TaxLineDetail                 TaxLineDetail                `json:",omitempty"`
 	JournalEntryLineDetail        JournalEntryLineDetail       `json:",omitempty"`
 	ItemBasedExpenseLineDetail    ItemBasedExpenseLineDetail   `json:",omitempty"`
+	GroupLineDetail               *GroupLineDetail             `json:",omitempty"`
+}
+
+// GroupLineDetail holds a bundle (group item) line. The bundle's component
+// sales lines are nested in Line.
+type GroupLineDetail struct {
+	GroupItemRef ReferenceType
+	Quantity     json.Number `json:",omitempty"`
+	UOMRef       *UOMRef     `json:",omitempty"`
+	ServiceDate  *Date       `json:",omitempty"`
+	Line         []Line      `json:",omitempty"`
+}
+
+// UOMRef references a unit of measure.
+type UOMRef struct {
+	Unit      string
+	UOMSetRef *ReferenceType `json:",omitempty"`
 }
 
 // TaxLineDetail ...

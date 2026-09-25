@@ -119,4 +119,10 @@ type Account struct { ... }
 
 ## API Reference
 
-The file `QuickBooks Online API Collections.postman_collection.json` in the repo root is the authoritative reference for field names, required vs optional status, and API shapes. Cross-check all struct definitions against it.
+The XSD files in `schema/` (Intuit's official schema, copied from their Java SDK; see `schema/README.md`) are the authoritative reference for entity types, field names, field types, and which fields exist. Entity types are in `schema/Finance.xsd`. Cross-check all struct definitions against it.
+
+- Elements with `minOccurs="0"` are optional → pointer types. Elements without it are required → value types.
+- The XSD uses the same types for create, update and read, so it doesn't say which fields are required on create. Use Intuit's per-entity API docs for that.
+- `xs:decimal` maps to `json.Number`, and `xs:date` / `xs:dateTime` map to `Date`.
+
+`QuickBooks Online API Collections.postman_collection.json` is a set of example requests, not a complete spec. It's useful for request shapes, but a field or type missing from it doesn't mean it's invalid.
